@@ -19,9 +19,9 @@ while True:
     
     # Send HTTP 1.0 response
     c.send('HTTP/1.0 200 OK\n')
-    # @comment              ^^worked for me but should probably be \r\n
+    # @comment              ^^worked for me on Chrome but should probably be \r\n
     c.send('Content-Type:text/html\n\n')
-    # @comment                      ^^worked for me but should probably be \r\n
+    # @comment                      ^^worked for me on Chrome but should probably be \r\n
     c.send("<h1>Hello, world</h1> this is massiek's Web server.")
     c.close()
     # so wow
@@ -30,3 +30,5 @@ while True:
     #       much protocol
     #
     #                  amaze
+    #
+    # reviewed by Zachary Hopping

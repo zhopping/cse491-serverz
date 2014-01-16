@@ -1,6 +1,7 @@
 2014-01-15  Kenneth Massie
  
  * Added feature to server.py to return static HTTP 1.0 response
+ # @comment Looks good.  Reviewed by Zachary Hopping.
 
 2014-01-07  Titus Brown  <t@Titus-MacBook-Air-2.local>
 
