@@ -21,6 +21,8 @@ while True:
     print 'Got connection from', client_host, client_port
     status = 'HTTP/1.0 200 OK\r\n'
     message = 'Content-Type: text/html\r\n\r\n'
+	# @comment This works great. I think it is standard to 
+	# include the Content-Length header though. You can do this with len(body)
     body = '<h1>Hello, world!</h1> This is yispencer\'s Web server.'
     c.send(status + message + body) 
     c.close()
