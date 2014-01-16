@@ -22,3 +22,9 @@ while True:
     c.send('Content-Type:text/html\n\n')
     c.send("<h1>Hello, world</h1> this is massiek's Web server.")
     c.close()
+    # so wow
+    #                  such socket
+    #        
+    #       much protocol
+    #
+    #                  amaze
