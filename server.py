@@ -19,8 +19,9 @@ while True:
     c, (client_host, client_port) = s.accept()
     # @comment
     # This doesn't work in chrome for me.
-    # You need to have \n\r\n\r
-    c.send("HTTP/1.0 200 OK\nContent-type:text/html\n\n<h1>Hello world</h1> this is zhopping's Web server")
+    # You need to have \n\r\n\r at the end of your message.
+    # I added it in for you.
+    c.send("HTTP/1.0 200 OK\nContent-type:text/html\n\n<h1>Hello world</h1> this is zhopping's Web server\n\r\n\r")
     print 'Got connection from', client_host, client_port
     c.send('Thank you for connecting')
     c.send("good bye.")
