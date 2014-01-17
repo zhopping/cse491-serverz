@@ -1,6 +1,10 @@
 import server
 
 class FakeConnection(object):
+    """
+    A fake connection class that mimics a real TCP socket for the purpose
+    of testing socket I/O.
+    """
     def __init__(self, to_recv):
         self.to_recv = to_recv
         self.sent = ""
@@ -20,6 +24,8 @@ class FakeConnection(object):
 
     def close(self):
         self.is_closed = True
+
+# Test a basic GET call.
 
 def test_handle_connection():
     conn = FakeConnection("GET / HTTP/1.0\r\n\r\n")
