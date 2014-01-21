@@ -17,7 +17,10 @@ print 'Entering infinite loop; hit CTRL-C to exit'
 while True:
     # Establish connection with client.    
     c, (client_host, client_port) = s.accept()
-    c.send("HTTP/1.0 200 OK\nContent-type:text/html\n\n<h1>Hello world</h1> this is zhopping's Web server")
+    c.send("HTTP/1.0 200 OK\r\n")
+    c.send("Content-type:text/html\r\n")
+    c.send("\r\n") # Separate headers from body
+    c.send("<h1>Hello world</h1> this is zhopping's Web server\r\n")
     print 'Got connection from', client_host, client_port
     c.send('Thank you for connecting')
     c.send("good bye.")
