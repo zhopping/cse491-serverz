@@ -4,3 +4,6 @@
  
 2014-01-14  Zachary Hopping <hoppingz@msu.edu>
  * Added code to server.py to return an HTTP response.
+
+ 2014-01-21  Zachary Hopping <hoppingz@msu.edu>
+ * Fixed line breaks and cleaned up code in server.py.
