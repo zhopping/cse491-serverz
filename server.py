@@ -18,6 +18,7 @@ def main():
     while True:
         # Establish connection with client.    
         c, (client_host, client_port) = s.accept()
+        
 def handle_connection(conn):
     conn.send("HTTP/1.0 200 OK\r\n")
     conn.send("Content-type:text/html\r\n")
