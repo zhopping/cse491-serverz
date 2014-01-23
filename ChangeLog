@@ -1,3 +1,14 @@
+2014-01-12  xavier.durandhollis <xavierdhjr@gmail.com>
+
+ * Updated server.py to display a hello world message. Server now prints
+ out Request headers from client on the console.
+
 2014-01-07  Titus Brown  <t@Titus-MacBook-Air-2.local>
 
  * Initialized repository, created server.py and README.
+
+2014-01-16  Seung Yi 
+
+ * Modified server.py to send status line, content type, and body message.
+ * Added print c.recv(1000) to see what happens. It seems to print out the
+   client's information
