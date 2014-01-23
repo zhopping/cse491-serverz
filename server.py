@@ -18,25 +18,52 @@ def main():
 	while True:
 		# Establish connection with client.    
 		c, (client_host, client_port) = s.accept()
-		print c.recv(1000)
 		print 'Got connection from', client_host, client_port
-		c.send('Thank you for connecting')
-		response_body_raw = "<html><body><h1>Hello world!</h1>This is xavierdhjr's Web server.</body></html>"
+		handle_connection(c)
 		
-		response_headers = {
-			'Content-Type': 'text/html; encoding=utf8',
-			'Content-Length': len(response_body_raw),
-			'Connection': 'close'
-		}
-		response_headers_raw = ''.join('%s: %s \r\n' % (k, v) for k, v in response_headers.iteritems())
-		
-		c.send('HTTP/1.1 200 OK \r\n')
-		c.send(response_headers_raw)
-		c.send(response_body_raw)
-		c.close()
-
 def handle_connection(conn):
-	pass
+	request = conn.recv(1000)
+	request_type = request.split(' ')[0]
+	path = request.split(' ')[1]
 
+
+	response_body_raw_root = 'HTTP/1.0 200 OK\r\n' + \
+					'Content-type: text/html\r\n' + \
+					'\r\n' + \
+					'<html><body>' + \
+					'<h1>Hello world!</h1>This is xavierdhjr\'s Web server.' + \
+					'<br/><a href="/content">Content</a>' + \
+					'<br/><a href="/file">File</a>' + \
+					'<br/><a href="/image">Image</a>' + \
+					'</body></html>'
+	response_body_raw_content = 'HTTP/1.0 200 OK\r\n' + \
+					'Content-type: text/html\r\n' + \
+					'\r\n' + \
+					'<html><body><h1>Content</h1>This is xavierdhjr\'s Web server.</body></html>'
+	response_body_raw_file = 'HTTP/1.0 200 OK\r\n' + \
+					'Content-type: text/html\r\n' + \
+					'\r\n' + \
+					'<html><body><h1>File</h1>This is xavierdhjr\'s Web server.</body></html>'
+	response_body_raw_image = 'HTTP/1.0 200 OK\r\n' + \
+					'Content-type: text/html\r\n' + \
+					'\r\n' + \
+					'<html><body><h1>Image</h1>This is xavierdhjr\'s Web server.</body></html>'
+	
+	if request_type == "POST":
+		conn.send("hello world")
+		conn.close()
+		return
+		
+	if path == '/':
+		conn.send(response_body_raw_root)
+	if path == '/content':
+		conn.send(response_body_raw_content)
+	if path == '/file':
+		conn.send(response_body_raw_file)
+	if path == '/image':
+		conn.send(response_body_raw_image)
+		
+	conn.close()
+	
 if __name__ == '__main__':
    main()
