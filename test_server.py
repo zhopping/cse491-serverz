@@ -34,7 +34,8 @@ def test_handle_connection_basic():
                       '\r\n' + \
                       '<a href="/content">CONTENT</a><br>' + \
                       '<a href="/file">FILE</a><br>' + \
-                      '<a href="/image">IMAGE</a><br>'
+                      '<a href="/image">IMAGE</a><br>' + \
+                      '<a href="/form">FORM</a><br>'
 
     server.handle_connection(conn)
 
@@ -82,6 +83,28 @@ def test_handle_connection_post():
                       'Content-type: text/html\r\n' + \
                       '\r\n' + \
                       '<h1>Hello, world.</h1>'
+
+    server.handle_connection(conn)
+
+    assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
+
+def test_form_submit_get():
+    conn = FakeConnection("GET /submit?firstname=Dignitas&lastname=Imaqtpie HTTP/1.0\r\n\r\n")
+    expected_return = 'HTTP/1.0 200 OK\r\n' + \
+                      'Content-type: text/html\r\n' + \
+                      '\r\n' + \
+                      '<h1>Hello Mr. Dignitas Imaqtpie.</h1>'
+
+    server.handle_connection(conn)
+
+    assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
+
+def test_form_submit_post():
+    conn = FakeConnection("POST /submit HTTP/1.0\r\n\r\nfirstname=Dignitas&lastname=Imaqtpie")
+    expected_return = 'HTTP/1.0 200 OK\r\n' + \
+                      'Content-type: text/html\r\n' + \
+                      '\r\n' + \
+                      '<h1>Hello Mr. Dignitas Imaqtpie.</h1>'
 
     server.handle_connection(conn)
 

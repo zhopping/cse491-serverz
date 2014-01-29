@@ -13,3 +13,7 @@
  * Added handling for content, image, and file request paths to server.py.
  * Added basic support for POST requests to server.py.
  * Added tests for different request paths and POST requests in test_server.py.
+
+ 2014-01-29  Zachary Hopping <hoppingz@msu.edu>
+ * Added basic form and support for GET and POST form submissions.
+ * Refactored "handle_connection" function
