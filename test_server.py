@@ -64,6 +64,17 @@ def test_handle_connection_file():
 
     assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
 
+def test_handle_connection_file():
+    conn = FakeConnection("GET /pagethatdoesntexist HTTP/1.0\r\n\r\n")
+    expected_return = 'HTTP/1.0 404 Not Found\r\n' + \
+                      'Content-type: text/html\r\n' + \
+                      '\r\n' + \
+                      '<h1>Error 404 Page Not Found</h1>'
+
+    server.handle_connection(conn)
+
+    assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
+
 def test_handle_connection_image():
     conn = FakeConnection("GET /image HTTP/1.0\r\n\r\n")
     expected_return = 'HTTP/1.0 200 OK\r\n' + \
@@ -72,6 +83,21 @@ def test_handle_connection_image():
                       '<h1>Image Example</h1><br>' + \
                       '<img border="0" src="http://static3.wikia.nocookie.net/__' + \
                       'cb20130826211346/creepypasta/images/0/01/DOGE.png" alt="DOGE">'
+
+    server.handle_connection(conn)
+
+    assert conn.sent == expected_return, 'Got: %s' % (repr(conn.sent),)
+
+def test_basic_form():
+    conn = FakeConnection("GET /form HTTP/1.0\r\n\r\n")
+    expected_return = 'HTTP/1.0 200 OK\r\n' + \
+                      'Content-type: text/html\r\n' + \
+                      '\r\n' + \
+                      "<form action='/submit' method='POST'>" + \
+                      "First Name: <input type='text' name='firstname'><br>" + \
+                      "Last Name: <input type='text' name='lastname'><br>" + \
+                      "<input type='submit' value='Submit'>" + \
+                      "</form>"
 
     server.handle_connection(conn)
 

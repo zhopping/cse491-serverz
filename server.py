@@ -107,11 +107,18 @@ def serve_file(conn, request):
     conn.send('<h1>File</h1><br>')
     conn.close()
 
+def send_404_error(conn, request):
+    conn.send('HTTP/1.0 404 Not Found\r\n')
+    conn.send('Content-type: text/html\r\n')
+    conn.send('\r\n') #separate headers from body
+    conn.send('<h1>Error 404 Page Not Found</h1>')
+    conn.close()
+
 # parses incoming request data and serves appropriate page data
 def handle_connection(conn):
     request = conn.recv(1000)
     params = request.split(' ')
-    if params[0] == 'GET':
+    if request.startswith('GET'):
         parsed_url = urlparse.urlparse(params[1])
         path = parsed_url.path
         if path == '/':
@@ -127,7 +134,7 @@ def handle_connection(conn):
         elif path == '/image':
             serve_image(conn, request)
         else:
-            pass # should send 404 error
+            send_404_error(conn, request)
     elif params[0] == 'POST':
         parsed_url = urlparse.urlparse(params[1])
         path = parsed_url.path
