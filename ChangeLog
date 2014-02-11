@@ -17,3 +17,10 @@
  2014-01-29  Zachary Hopping <hoppingz@msu.edu>
  * Added basic form and support for GET and POST form submissions.
  * Refactored "handle_connection" function
+
+ 2014-01-5  Zachary Hopping <hoppingz@msu.edu>
+ * Added support for multipart encoded post requests
+
+ 2014-01-29  Zachary Hopping <hoppingz@msu.edu>
+ * Added support for variable length requests
+ # Added jinja templating
