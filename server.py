@@ -36,8 +36,6 @@ def handle_connection(conn):
         request += conn.recv(1)
         bytes_read += 1
 
-    print "BYTES READ: " + str(bytes_read)
-
     if not request:
         conn.close()
         return
@@ -52,17 +50,6 @@ def handle_connection(conn):
         path = request.split(' ')[1]
 
     parsed_url = urlparse.urlparse(path)
-    # print "Request Information ----------"
-    # print "Path: " + path
-    # print "Type: " + request_type
-    # print "Params: " + parsed_url.params
-    # print "Query: " + parsed_url.query
-
-    #raw_request, raw_headers= request.split('\r\n',1)    # split request line and headers
-    #headers = Message(StringIO(raw_headers))   # headers can be thought as a dictionary
-
-    
-
 
     if request_type == "POST":
         headers = {}
@@ -76,8 +63,15 @@ def handle_connection(conn):
 
         # Extracts message from request.
         payload = ''
-        while len(payload) < int(headers['content-length']):
-            payload += conn.recv(1)
+        if 'content-length' in headers.keys():
+            while len(payload) < int(headers['content-length']):
+                payload += conn.recv(1)
+        else:
+            current_byte = conn.recv(1)
+            while current_byte:
+                payload += current_byte
+                current_byte = conn.recv(1)
+        
 
         if("content-type" in headers.keys()):
             if("application/x-www-form-urlencoded" in headers["content-type"]):
@@ -87,7 +81,6 @@ def handle_connection(conn):
                 environ['REQUEST_METHOD'] = 'POST'
 
                 form = cgi.FieldStorage(headers=headers, fp=StringIO(payload), environ=environ)
-                print form.keys()
                 handle_multipart_post_request(conn, path, form) 
         else:
             handle_post_request(conn, path, payload)
@@ -96,8 +89,8 @@ def handle_connection(conn):
         handle_get_request(path, parsed_url, conn)
 
     else:
-        send_404_error(conn)
-        # Should serve 'bad request' page?
+        conn.send(http_404_header())
+        conn.send("Invalid request syntax")
 
     conn.close()
 
@@ -106,23 +99,25 @@ def handle_connection(conn):
 # parses post submission from basic form
 def handle_post_request(conn, path, payload):
     if path.startswith('/submit'):
-        parsed_query = parse_qs(payload)
+        parsed_query = urlparse.parse_qs(payload)
         handle_form_submit(parsed_query['firstname'][0], parsed_query['lastname'][0], conn)
     else:
-        send_404_error(conn)
+        conn.send(http_404_header())
+        conn.send("Invalid request")
 
 def handle_multipart_post_request(conn, path, form):
     if(path == '/submit'):
         handle_form_submit(form.getvalue("'firstname'"),form.getvalue("'lastname'"),conn)
     else:
-        send_404_error(conn)
+        conn.send(http_404_header())
+        conn.send("Invalid request")
 
 # parse and correctly serve all get requests
 def handle_get_request(path, parsed_url, conn):
     parsed_path = parsed_url.path
 
     if(path.split('?')[0] == "/submit"):
-        form_data = parse_qs(parsed_path.query)
+        form_data = urlparse.parse_qs(parsed_url.query)
         handle_form_submit(form_data["firstname"][0],form_data["lastname"][0],conn)
         return
 
@@ -134,12 +129,8 @@ def handle_get_request(path, parsed_url, conn):
     dirname, filename = os.path.split(os.path.abspath(__file__))
     dirname = dirname + "/"
 
-    print "DIRNAME: " + dirname
-
     loader = jinja2.FileSystemLoader(dirname + "templates")
     env = jinja2.Environment(loader=loader,autoescape=True)
-
-    print "Path:",path
 
     try:
         template = env.get_template(path)
@@ -151,17 +142,9 @@ def handle_get_request(path, parsed_url, conn):
         conn.send(http_404_header()) # Could not find file to serve
         conn.send(template.render())
 
-    print 'request handled'
-
 def handle_form_submit(first_name, last_name, conn):
     conn.send(http_header())
-    conn.send('<h1>Hello Mr. %s %s.</h1>'%(first_name, last_name))
-    conn.close()
-
-
-def send_404_error(conn):
-    conn.send(http_404_header())
-    conn.send('<h1>Error 404 Page Not Found</h1>')
+    conn.send('<html><body><h1>Hello Mr. %s %s.</h1></body></html>'%(first_name, last_name))
     conn.close()
 
 def http_header():
