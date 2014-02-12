@@ -18,44 +18,26 @@ def render_page(page, params):
 
 class MyApp(object):
     def __call__(self, environ, start_response):
-        options = {'/'            : self.index,
-                   '/content'     : self.content,
-                   '/files'       : self.files,
-                   '/images'      : self.images,
-                   '/form'        : self.form,
-                   '/submit'      : self.submit   }
+        options = {'/'            : 'index',
+                   '/content'     : 'content',
+                   '/files'       : 'files',
+                   '/images'      : 'images',
+                   '/form'        : 'form',
+                   '/submit'      : 'submit'   }
 
         path = environ['PATH_INFO']
         page = options.get(path)
 
-        if page is None:
-            return self.error(environ, start_response)
+        return self.retrieve_page(environ, start_response, page)
 
-        return page(environ, start_response)
-
-    def error(self, environ, start_response):
-        start_response('404 Not Found', [('Content-type', 'text/html')])
-        return render_page('error.html','')
-
-    def index(self, environ, start_response):
-        start_response('200 OK', [('Content-type', 'text/html')])
-        return render_page('index.html','')
-
-    def content(self, environ, start_response):
-        start_response('200 OK', [('Content-type', 'text/html')])
-        return render_page('content.html','')
-
-    def files(self, environ, start_response):
-        start_response('200 OK', [('Content-type', 'text/html')])
-        return render_page('files.html','')
-
-    def images(self, environ, start_response):
-        start_response('200 OK', [('Content-type', 'text/html')])
-        return render_page('images.html','')
-
-    def form(self, environ, start_response):
-        start_response('200 OK', [('Content-type', 'text/html')])
-        return render_page('form.html','')
+    def retrieve_page(self, environ, start_response, page):
+    	if page is None:
+    		start_response('404 Not Found', [('Content-type', 'text/html')])
+    		page = 'error'
+    	else:
+    		start_response('200 OK', [('Content-type', 'text/html')])
+    	page_filename = '%s.html' % page
+    	return render_page(page_filename,'')
 
     def submit(self, environ, start_response):
         method = environ['REQUEST_METHOD']
