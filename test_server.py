@@ -54,7 +54,7 @@ def test_handle_connection_form_get():
   assert conn.sent == expected_return, 'Expected:\n%s\n\nGot:\n%s' % (repr(expected_return),repr(conn.sent),)
 
 def test_handle_connection_form_explicit_post():
-  payload = "firstname=Beautiful&lastname=Shibe\r\n"
+  payload = "firstname=Beautiful&lastname=Shibe"
 
   conn = FakeConnection(
     "POST /submit HTTP/1.0\r\n" + \
@@ -72,10 +72,10 @@ def test_handle_connection_form_explicit_post():
 
 def test_handle_connection_multipart_form_post():
   payload = "--AaB03x\r\n" + \
-        "Content-Disposition: form-data; name='firstname';\r\n\r\n" + \
+        "Content-Disposition: form-data; name=firstname;\r\n\r\n" + \
         "Beautiful\r\n" + \
         "--AaB03x\r\n" + \
-        "Content-Disposition: form-data; name='lastname';\r\n\r\n" + \
+        "Content-Disposition: form-data; name=lastname;\r\n\r\n" + \
         "Shibe\r\n" + \
         "--AaB03x--\r\n"
 
