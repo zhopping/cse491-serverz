@@ -37,14 +37,16 @@ def main():
     s.listen(5)                 # Now wait for client connection.
 
     print 'Entering infinite loop; hit CTRL-C to exit'
+
+    environ = get_environ(port)
     while True:
         # Establish connection with client.    
         c, (client_host, client_port) = s.accept()
         print 'Got connection from', client_host, client_port
-        handle_connection(c)
+        handle_connection(c, environ)
 
 # parses incoming request data and serves appropriate page data
-def handle_connection(conn):
+def handle_connection(conn, environ):
     # Borrowed WSGI compatibility code from github user 'maxwellgbrown'
     # Start reading in data from the connection
     read = conn.recv(1)
@@ -59,9 +61,6 @@ def handle_connection(conn):
         headers[k.lower()] = v
 
     parsed_url = urlparse.urlparse(request.split(' ', )[1])
-    
-    #initialize environ dictionary
-    environ = {}
     
     environ['PATH_INFO'] = parsed_url[2]
     environ['QUERY_STRING'] = parsed_url[4]
@@ -92,11 +91,26 @@ def handle_connection(conn):
     application = app.make_app()
     
     response_html = application(environ, start_response)
-    for html in response_html:
-        conn.send(html)
+    conn.send(response_html)
     
     # close the connection
     conn.close()
+
+# Generates environ dict for use in this class and testing
+def get_environ(port = 9999):
+    environ = {}
+
+    environ['SERVER_NAME'] = "beans"
+    environ['SERVER_PORT'] = str(port)
+    environ['wsgi.version'] = (1,0)
+    environ['wsgi.errors'] = StringIO()
+    environ['wsgi.multithread'] = False
+    environ['wsgi.multiprocess'] = False
+    environ['wsgi.run_once'] = False
+    environ['wsgi.url_scheme'] = 'http'
+    environ['SCRIPT_NAME'] = ""
+
+    return environ
 
 if __name__ == '__main__':
     main()
