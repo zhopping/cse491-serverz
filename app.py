@@ -34,6 +34,10 @@ class MyApp(object):
     	if page is None:
     		start_response('404 Not Found', [('Content-type', 'text/html')])
     		page = 'error'
+        elif page is 'images':
+            return self.serve_image(start_response)
+        elif page is 'files':
+            return self.serve_text_file(start_response)
     	else:
     		start_response('200 OK', [('Content-type', 'text/html')])
     	page_filename = '%s.html' % page
@@ -64,5 +68,19 @@ class MyApp(object):
         start_response('200 OK', con_type)
         return render_page('submit.html', params)
 
+    def serve_text_file(self, start_response):
+        start_response('200 OK', [('Content-type', 'text/plain')])
+        fp = open('./text_file.txt', "rb")
+        data = fp.read()
+        fp.close()
+        return data
+
+    def serve_image(self, start_response):
+        start_response('200 OK', [('Content-type', 'image/jpeg')])
+        fp = open('./doge.jpg', "rb")
+        data = fp.read()
+        fp.close()
+        return data
+
 def make_app():
-    return simple_app
+    return MyApp()
