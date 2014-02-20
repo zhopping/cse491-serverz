@@ -38,6 +38,8 @@ class MyApp(object):
             return self.serve_image(start_response)
         elif page is 'files':
             return self.serve_text_file(start_response)
+        elif page is 'submit':
+            return self.submit(environ, start_response)
     	else:
     		start_response('200 OK', [('Content-type', 'text/html')])
     	page_filename = '%s.html' % page
@@ -65,7 +67,7 @@ class MyApp(object):
             fs = cgi.FieldStorage(fp=environ['wsgi.input'], \
                                   headers=headers, environ=environ)
             params.update({x: [fs[x].value] for x in fs.keys()}) 
-        start_response('200 OK', con_type)
+        start_response('200 OK', [('Content-type', con_type)])
         return render_page('submit.html', params)
 
     def serve_text_file(self, start_response):

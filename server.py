@@ -47,7 +47,7 @@ def main():
 
 # parses incoming request data and serves appropriate page data
 def handle_connection(conn, environ):
-    # Borrowed WSGI compatibility code from github user 'maxwellgbrown'
+    # Borrowed some WSGI compatibility code from github user 'maxwellgbrown'
     # Start reading in data from the connection
     read = conn.recv(1)
     while read[-4:] != '\r\n\r\n':

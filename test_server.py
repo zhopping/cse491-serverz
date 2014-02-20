@@ -27,10 +27,13 @@ class FakeConnection(object):
 
 def test_handle_connection_bad_request_type():
 
+  payload = "BADREQUEST\r\n"
+
   conn = FakeConnection(
-    "DOGE /doge HTTP/1.0\r\n" + \
-    "Content-Type: application/x-www-form-urlencoded\r\n\r\n" + \
-    "LOLTHISREQUESTISBAD")
+    "POST /doge HTTP/1.0\r\n" + \
+    "Content-Type: application/x-www-form-urlencoded\r\n" + \
+    "Content-Length: " + str(len(payload)) + "\r\n\r\n" + \
+    payload)
   expected_return = 'HTTP/1.0 404 Not Found\r\nContent-type: text/html\r\n\r\n' + \
   '<!DOCTYPE html>\n<html>\n\n<head>\n\n  <title>  Web Server - Error Page  </title>\n\n</head>\n\n' + \
   '<body>\n\n\n<h1>Error Page</h1>\nThis page does not exist\n\n\n</body>\n </html>'
@@ -41,73 +44,48 @@ def test_handle_connection_bad_request_type():
 
 def test_handle_connection_form_get():
   conn = FakeConnection("GET /submit?firstname=Beautiful&lastname=Shibe HTTP/1.0\r\n\r\n")
-  expected_return = 'HTTP/1.0 200 OK\r\n' + \
-      'Content-type: text/html\r\n' + \
-      '\r\n' +\
-      "<html><body>" + \
-      "<h1>Hello Mr. Beautiful Shibe.</h1>" + \
-      "</body></html>"
-
-  server.handle_connection(conn, server.get_environ())
-
-  assert conn.sent == expected_return, 'Expected:\n%s\n\nGot:\n%s' % (repr(expected_return),repr(conn.sent),)
-
-def test_handle_connection_form_post():
-  conn = FakeConnection(
-    "POST /submit HTTP/1.0\r\n\r\n" + \
-    "firstname=Beautiful&lastname=Shibe")
-  expected_return = 'HTTP/1.0 200 OK\r\n' + \
-      'Content-type: text/html\r\n' + \
-      '\r\n' +\
-      "<html><body>" + \
-      "<h1>Hello Mr. Beautiful Shibe.</h1>" + \
-      "</body></html>"
+  expected_return = 'HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n' + \
+                    '<!DOCTYPE html>\n<html>\n\n<head>\n\n  ' + \
+                    '<title>  Web Server - Submit Page  </title>\n\n</head>\n\n' + \
+                    '<body>\n\n\n<h1>Submit Page</h1>\nHello Beautiful Shibe\n\n\n</body>\n </html>'
 
   server.handle_connection(conn, server.get_environ())
 
   assert conn.sent == expected_return, 'Expected:\n%s\n\nGot:\n%s' % (repr(expected_return),repr(conn.sent),)
 
 def test_handle_connection_form_explicit_post():
+  payload = "firstname=Beautiful&lastname=Shibe\r\n"
+
   conn = FakeConnection(
     "POST /submit HTTP/1.0\r\n" + \
-    "Content-Type: application/x-www-form-urlencoded\r\n\r\n" + \
-    "firstname=Beautiful&lastname=Shibe")
-  expected_return = 'HTTP/1.0 200 OK\r\n' + \
-      'Content-type: text/html\r\n' + \
-      '\r\n' +\
-      "<html><body>" + \
-      "<h1>Hello Mr. Beautiful Shibe.</h1>" + \
-      "</body></html>"
+    "Content-Type: application/x-www-form-urlencoded\r\n" + \
+    "Content-Length: " + str(len(payload)) + "\r\n\r\n" + \
+    payload)
+  expected_return = 'HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n' + \
+                    '<!DOCTYPE html>\n<html>\n\n<head>\n\n  ' + \
+                    '<title>  Web Server - Submit Page  </title>\n\n</head>\n\n' + \
+                    '<body>\n\n\n<h1>Submit Page</h1>\nHello Beautiful Shibe\n\n\n</body>\n </html>'
 
   server.handle_connection(conn, server.get_environ())
 
   assert conn.sent == expected_return, 'Expected:\n%s\n\nGot:\n%s' % (repr(expected_return),repr(conn.sent),)
 
 def test_handle_connection_multipart_form_post():
-  conn = FakeConnection(
-    "POST /submit HTTP/1.0\r\n" + \
-    "Content-Type: multipart/form-data; boundary=AaB03x\r\n\r\n" +\
-    "--AaB03x\r\n" +\
-    "Content-Disposition: form-data; name='firstname'\r\n" +\
-    "\r\n" +\
-    "Beautiful\r\n" +\
-    "--AaB03x\r\n" +\
-    "Content-Disposition: form-data; name='lastname'\r\n" +\
-    "\r\n" +\
-    "Shibe\r\n" +\
-    "--AaB03x\r\n" +\
-    "Content-Disposition: form-data; name='files'; filename='file1.txt'\r\n" +\
-    "Content-Type: text/plain\r\n" +\
-    "\r\n" +\
-    "... contents of file1.txt ...\r\n" +\
-    "--AaB03x--\r\n"
-    )
-  expected_return = 'HTTP/1.0 200 OK\r\n' + \
-        'Content-type: text/html\r\n' + \
-        '\r\n' +\
-        "<html><body>" + \
-        "<h1>Hello Mr. Beautiful Shibe.</h1>" + \
-        "</body></html>"
+  payload = "--AaB03x\r\n" + \
+        "Content-Disposition: form-data; name='firstname';\r\n\r\n" + \
+        "Beautiful\r\n" + \
+        "--AaB03x\r\n" + \
+        "Content-Disposition: form-data; name='lastname';\r\n\r\n" + \
+        "Shibe\r\n" + \
+        "--AaB03x--\r\n"
+
+  conn = FakeConnection("POST /submit HTTP/1.0\r\n" + \
+              "Content-Length: " + (str(len(payload))) + "\r\n"  + \
+              "Content-Type: multipart/form-data; boundary=AaB03x\r\n\r\n" + payload)
+  expected_return = 'HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n' + \
+                    '<!DOCTYPE html>\n<html>\n\n<head>\n\n  ' + \
+                    '<title>  Web Server - Submit Page  </title>\n\n</head>\n\n' + \
+                    '<body>\n\n\n<h1>Submit Page</h1>\nHello Beautiful Shibe\n\n\n</body>\n </html>'
 
   server.handle_connection(conn, server.get_environ())
 
@@ -115,27 +93,23 @@ def test_handle_connection_multipart_form_post():
 
 
 def test_handle_connection_bad_form_post():
+  payload = "firstname=Beautiful&lastname=Shibe\r\n"
 
   conn = FakeConnection(
     "POST /doge HTTP/1.0\r\n" + \
-    "Content-Type: application/x-www-form-urlencoded\r\n\r\n" + \
-    "firstname=Beautiful&lastname=Shibe")
-  expected_return = u'HTTP/1.0 404 Not found\r\n' + \
-          'Content-type: text/html\r\n' + \
-          'Connection: close\r\n' + \
-          '\r\n' + \
-          'Invalid request'
+    "Content-Type: application/x-www-form-urlencoded\r\n" + \
+    "Content-Length: " + str(len(payload)) + "\r\n\r\n" + \
+    payload)
+  expected_return = 'HTTP/1.0 404 Not Found\r\nContent-type: text/html\r\n\r\n' + \
+  '<!DOCTYPE html>\n<html>\n\n<head>\n\n  <title>  Web Server - Error Page  </title>\n\n</head>\n\n' + \
+  '<body>\n\n\n<h1>Error Page</h1>\nThis page does not exist\n\n\n</body>\n </html>'
 
   server.handle_connection(conn, server.get_environ())
 
   assert conn.sent == expected_return, 'Expected:\n%s\n\nGot:\n%s' % (repr(expected_return),repr(conn.sent),)
 
 def test_handle_connection_bad_multipart_form_post():
-
-  conn = FakeConnection(
-    "POST /dingus HTTP/1.0\r\n" + \
-    "Content-Type: multipart/form-data; boundary=AaB03x\r\n\r\n" +\
-    "--AaB03x\r\n" +\
+  payload = "--AaB03x\r\n" +\
     "Content-Disposition: form-data; name='firstname'\r\n" +\
     "\r\n" +\
     "Beautiful\r\n" +\
@@ -143,18 +117,15 @@ def test_handle_connection_bad_multipart_form_post():
     "Content-Disposition: form-data; name='lastname'\r\n" +\
     "\r\n" +\
     "Shibe\r\n" +\
-    "--AaB03x\r\n" +\
-    "Content-Disposition: form-data; name='files'; filename='file1.txt'\r\n" +\
-    "Content-Type: text/plain\r\n" +\
-    "\r\n" +\
-    "... contents of file1.txt ...\r\n" +\
-    "--AaB03x--\r\n"
-    )
-  expected_return = u'HTTP/1.0 404 Not found\r\n' + \
-          'Content-type: text/html\r\n' + \
-          'Connection: close\r\n' + \
-          '\r\n' + \
-          'Invalid request'
+    "--AaB03x\r\n"
+
+  conn = FakeConnection("POST /dingus HTTP/1.0\r\n" + \
+                        "Content-Length: " + (str(len(payload))) + "\r\n"  + \
+                        "Content-Type: multipart/form-data; boundary=AaB03x\r\n\r\n" + \
+                        payload)
+  expected_return = 'HTTP/1.0 404 Not Found\r\nContent-type: text/html\r\n\r\n' + \
+  '<!DOCTYPE html>\n<html>\n\n<head>\n\n  <title>  Web Server - Error Page  </title>\n\n</head>\n\n' + \
+  '<body>\n\n\n<h1>Error Page</h1>\nThis page does not exist\n\n\n</body>\n </html>'
 
   server.handle_connection(conn, server.get_environ())
 
