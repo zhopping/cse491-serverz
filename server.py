@@ -12,15 +12,18 @@ import app
 
 import quixote
 from quixote.demo import create_publisher
-#from quixote.demo.mini_demo import create_publisher
-#from quixote.demo.altdemo import create_publisher
+# from quixote.demo.mini_demo import create_publisher
+# from quixote.demo.altdemo import create_publisher
+import imageapp
 
 _the_app = None
 def make_app():
     global _the_app
 
     if _the_app is None:
-        p = create_publisher()
+        imageapp.setup()
+
+        p = imageapp.create_publisher()
         _the_app = quixote.get_wsgi_app()
 
     return _the_app
@@ -65,6 +68,7 @@ def handle_connection(conn, environ):
     environ['PATH_INFO'] = parsed_url[2]
     environ['QUERY_STRING'] = parsed_url[4]
     environ['SCRIPT_NAME'] = ''
+    environ['HTTP_COOKIES'] = headers['cookie']
     content = ''
     if request.startswith('POST '):
         environ['REQUEST_METHOD'] = 'POST'
@@ -88,10 +92,11 @@ def handle_connection(conn, environ):
         conn.send('\r\n')
 
     # make the app  
-    application = app.make_app()
+    application = make_app()
     
     response_html = application(environ, start_response)
-    conn.send(response_html)
+    for html in response_html:
+        conn.send(html)
     
     # close the connection
     conn.close()

@@ -31,19 +31,24 @@ class MyApp(object):
         return self.retrieve_page(environ, start_response, page)
 
     def retrieve_page(self, environ, start_response, page):
+        data = []
     	if page is None:
-    		start_response('404 Not Found', [('Content-type', 'text/html')])
-    		page = 'error'
+            start_response('404 Not Found', [('Content-type', 'text/html')])
+            page_filename = 'error.html'
+            data.append(render_page(page_filename,''))
+            return data
         elif page is 'images':
-            return self.serve_image(start_response)
+            data.append(self.serve_image(start_response))
         elif page is 'files':
-            return self.serve_text_file(start_response)
+            data.append(self.serve_text_file(start_response))
         elif page is 'submit':
-            return self.submit(environ, start_response)
+            data.append(self.submit(environ, start_response))
     	else:
-    		start_response('200 OK', [('Content-type', 'text/html')])
-    	page_filename = '%s.html' % page
-    	return render_page(page_filename,'')
+            start_response('200 OK', [('Content-type', 'text/html')])
+            page_filename = '%s.html' % page
+            data.append(render_page(page_filename,''))
+
+        return data
 
     def submit(self, environ, start_response):
         method = environ['REQUEST_METHOD']
@@ -68,7 +73,6 @@ class MyApp(object):
                                   headers=headers, environ=environ)
             params.update({x: [fs[x].value] for x in fs.keys()}) 
         start_response('200 OK', [('Content-type', 'text/html')])
-        print params
         return render_page('submit.html', params)
 
     def serve_text_file(self, start_response):
