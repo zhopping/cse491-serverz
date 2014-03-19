@@ -38,7 +38,7 @@ def test_handle_connection_bad_request_type():
   '<!DOCTYPE html>\n<html>\n\n<head>\n\n  <title>  Web Server - Error Page  </title>\n\n</head>\n\n' + \
   '<body>\n\n\n<h1>Error Page</h1>\nThis page does not exist\n\n\n</body>\n </html>'
 
-  server.handle_connection(conn, server.get_environ())
+  server.handle_connection(conn, server.get_environ(), 'myapp')
 
   assert conn.sent == expected_return, 'Expected:\n%s\n\nGot:\n%s' % (repr(expected_return),repr(conn.sent),)
 
@@ -49,7 +49,7 @@ def test_handle_connection_form_get():
                     '<title>  Web Server - Submit Page  </title>\n\n</head>\n\n' + \
                     '<body>\n\n\n<h1>Submit Page</h1>\nHello Beautiful Shibe\n\n\n</body>\n </html>'
 
-  server.handle_connection(conn, server.get_environ())
+  server.handle_connection(conn, server.get_environ(), 'myapp')
 
   assert conn.sent == expected_return, 'Expected:\n%s\n\nGot:\n%s' % (repr(expected_return),repr(conn.sent),)
 
@@ -66,7 +66,7 @@ def test_handle_connection_form_explicit_post():
                     '<title>  Web Server - Submit Page  </title>\n\n</head>\n\n' + \
                     '<body>\n\n\n<h1>Submit Page</h1>\nHello Beautiful Shibe\n\n\n</body>\n </html>'
 
-  server.handle_connection(conn, server.get_environ())
+  server.handle_connection(conn, server.get_environ(), 'myapp')
 
   assert conn.sent == expected_return, 'Expected:\n%s\n\nGot:\n%s' % (repr(expected_return),repr(conn.sent),)
 
@@ -87,7 +87,7 @@ def test_handle_connection_multipart_form_post():
                     '<title>  Web Server - Submit Page  </title>\n\n</head>\n\n' + \
                     '<body>\n\n\n<h1>Submit Page</h1>\nHello Beautiful Shibe\n\n\n</body>\n </html>'
 
-  server.handle_connection(conn, server.get_environ())
+  server.handle_connection(conn, server.get_environ(), 'myapp')
 
   assert conn.sent == expected_return, 'Expected:\n%s\n\nGot:\n%s' % (repr(expected_return),repr(conn.sent),)
 
@@ -104,7 +104,7 @@ def test_handle_connection_bad_form_post():
   '<!DOCTYPE html>\n<html>\n\n<head>\n\n  <title>  Web Server - Error Page  </title>\n\n</head>\n\n' + \
   '<body>\n\n\n<h1>Error Page</h1>\nThis page does not exist\n\n\n</body>\n </html>'
 
-  server.handle_connection(conn, server.get_environ())
+  server.handle_connection(conn, server.get_environ(), 'myapp')
 
   assert conn.sent == expected_return, 'Expected:\n%s\n\nGot:\n%s' % (repr(expected_return),repr(conn.sent),)
 
@@ -127,7 +127,7 @@ def test_handle_connection_bad_multipart_form_post():
   '<!DOCTYPE html>\n<html>\n\n<head>\n\n  <title>  Web Server - Error Page  </title>\n\n</head>\n\n' + \
   '<body>\n\n\n<h1>Error Page</h1>\nThis page does not exist\n\n\n</body>\n </html>'
 
-  server.handle_connection(conn, server.get_environ())
+  server.handle_connection(conn, server.get_environ(), 'myapp')
 
   assert conn.sent == expected_return, 'Expected:\n%s\n\nGot:\n%s' % (repr(expected_return),repr(conn.sent),)
 
@@ -138,7 +138,7 @@ def test_handle_connection_bad_page():
   '<!DOCTYPE html>\n<html>\n\n<head>\n\n  <title>  Web Server - Error Page  </title>\n\n</head>\n\n' + \
   '<body>\n\n\n<h1>Error Page</h1>\nThis page does not exist\n\n\n</body>\n </html>'
 
-  server.handle_connection(conn, server.get_environ())
+  server.handle_connection(conn, server.get_environ(), 'myapp')
 
   assert conn.sent == expected_return, 'Expected:\n%s\n\nGot:\n%s' % (repr(expected_return),repr(conn.sent),)
 
@@ -152,7 +152,7 @@ def test_handle_connection_root():
                     "<a href='/content'>Content</a><br>\n<a href='/files'>Files</a><br>\n" + \
                     "<a href='/images'>Images</a><br>\n<a href='/form'>Form</a>\n\n\n</body>\n </html>"
 
-  server.handle_connection(conn, server.get_environ())
+  server.handle_connection(conn, server.get_environ(), 'myapp')
 
   assert conn.sent == expected_return, 'Expected:\n%s\n\nGot:\n%s' % (repr(expected_return),repr(conn.sent),)
 
@@ -163,7 +163,7 @@ def test_handle_connection_content():
                     '<title>  Web Server - Content Page  </title>\n\n' + \
                     '</head>\n\n<body>\n\n\n<h1>Content Page</h1>\nThis is the content page\n\n\n</body>\n </html>'
 
-  server.handle_connection(conn, server.get_environ())
+  server.handle_connection(conn, server.get_environ(), 'myapp')
 
   assert conn.sent == expected_return, 'Expected:\n%s\n\nGot:\n%s' % (repr(expected_return),repr(conn.sent),)
 
@@ -179,7 +179,7 @@ def test_handle_connection_file():
           'I like raspberries.\n' + \
           'I don\'t care much for honeydew.'
 
-  server.handle_connection(conn, server.get_environ())
+  server.handle_connection(conn, server.get_environ(), 'myapp')
 
   assert conn.sent == expected_return, 'Expected:\n%s\n\nGot:\n%s' % (repr(expected_return),repr(conn.sent),)
 
@@ -192,7 +192,7 @@ def test_handle_connection_image():
           '<img border="0" src="http://static3.wikia.nocookie.net/__cb20130826211346/creepypasta/images/0/01/DOGE.png" alt="DOGE">\n' + \
           '</body></html>'
 
-  server.handle_connection(conn, server.get_environ())
+  server.handle_connection(conn, server.get_environ(), 'myapp')
    # Ensure that a jpg file is received
   if ('HTTP/1.0 200 OK' and 'Content-type: image/jpeg') not in conn.sent:
     assert False
