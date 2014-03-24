@@ -36,9 +36,10 @@ $(document).ready(function() {
         message = $("message", xml).get(id);
 
         author = $("author", message).text();
+        timestamp = $("timestamp", message).text();
         content = $("text", message).text();
 
-        $("#messagewindow").prepend("<b>" + author + "</b>:" + content 
+        $("#messagewindow").prepend("<b>" + author + " (" + timestamp + ")" + "</b>" + content 
                                     + "<br>");
      });
   };

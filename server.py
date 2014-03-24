@@ -22,7 +22,8 @@ import quixote
 from quixote.demo.altdemo import create_publisher #login demo
 import imageapp
 from wsgiref.validate import validator
-import chat
+from chat.apps import ChatApp
+from quotes.apps import QuotesApp
 
 # global variables for command line app argument input
 _app_init_complete = False
@@ -58,8 +59,11 @@ def init_app(current_app):
             p = imageapp.create_publisher()
             _app_init_complete = True
         return quixote.get_wsgi_app()
-    elif (current_app = CHAT_APP):
+    elif (current_app == CHAT_APP):
         return ChatApp('./chat/html')
+    elif (current_app == QUOTES_APP):
+        return QuotesApp('./quotes/quotes.txt', './quotes/html')
+
 
 def main(socket_module = socket):
     s = socket_module.socket()         # Create a socket object
