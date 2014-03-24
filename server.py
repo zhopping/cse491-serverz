@@ -22,14 +22,17 @@ import quixote
 from quixote.demo.altdemo import create_publisher #login demo
 import imageapp
 from wsgiref.validate import validator
+import chat
 
 # global variables for command line app argument input
 _app_init_complete = False
 IMAGE_APP = 'image'
 MY_APP = 'myapp'
 QUIXOTE_ALTDEMO_APP = 'altdemo'
+CHAT_APP = 'chat'
+QUOTES_APP = 'quotes'
 
-VALID_APPS = [QUIXOTE_ALTDEMO_APP, MY_APP, IMAGE_APP]
+VALID_APPS = [QUIXOTE_ALTDEMO_APP, MY_APP, IMAGE_APP, CHAT_APP, QUOTES_APP]
 
 # parse command line arguments
 parser = argparse.ArgumentParser(description="Process app name and port args")
@@ -55,6 +58,8 @@ def init_app(current_app):
             p = imageapp.create_publisher()
             _app_init_complete = True
         return quixote.get_wsgi_app()
+    elif (current_app = CHAT_APP):
+        return ChatApp('./chat/html')
 
 def main(socket_module = socket):
     s = socket_module.socket()         # Create a socket object
