@@ -24,3 +24,9 @@
  2014-01-29  Zachary Hopping <hoppingz@msu.edu>
  * Added support for variable length requests
  # Added jinja templating
+
+ 2014-03-28  Zachary Hopping <hoppingz@msu.edu>
+ * Imageapp now supports uploading and viewing of TIFF and JPEG image formats
+ * Image filetype and the actual image data are stored upon upload
+ * Can specify application and port via command line argument for apps run on server
+ * Added twill test for app.py

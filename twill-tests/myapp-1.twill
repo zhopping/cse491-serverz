@@ -1,0 +1,16 @@
+follow content
+code 200
+find "This is the content page"
+
+go /files
+code 200
+
+go /images
+code 200
+
+go /form
+formvalue 1 firstname Zack
+formvalue 1 lastname Hopping
+submit
+code 200
+find "Hello Zack Hopping"
