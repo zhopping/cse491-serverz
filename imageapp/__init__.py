@@ -15,7 +15,8 @@ def setup():                            # stuff that should be run once.
     html.init_templates()
 
     some_data = open('imageapp/dice.png', 'rb').read()
-    image.add_image(some_data, 'png')
+    metadata = {'title':'Dice', 'description':'some dice', 'location':'Africa', 'date':'08/12/1999'}
+    image.add_image(some_data, 'png', metadata)
     
 
 def teardown():                         # stuff that should be run once.
