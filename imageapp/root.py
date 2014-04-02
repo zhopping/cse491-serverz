@@ -8,7 +8,9 @@ class RootDirectory(Directory):
 
     @export(name='')                    # this makes it public.
     def index(self):
-        return html.render('index.html')
+        metadata = image.get_latest_image()[2]
+
+        return html.render('index.html', values=metadata)
 
     @export(name='upload')
     def upload(self):
@@ -32,13 +34,22 @@ class RootDirectory(Directory):
         print 'received file with name:', the_file.base_filename
         data = the_file.read(int(1e9))
 
-        image.add_image(data, filetype)
+        # Get metadata from form
+        title = request.form['title']
+        description = request.form['description']
+        location = request.form['location']
+        date = request.form['date']
+        metadata = {'title':title, 'description':description, 'location':location, 'date':date}
+
+        image.add_image(data, filetype, metadata)
 
         return quixote.redirect('./')
 
     @export(name='image')
     def image(self):
-        return html.render('image.html')
+        metadata = image.get_latest_image()[2]
+
+        return html.render('image.html', values = metadata)
 
     @export(name='image_raw')
     def image_raw(self):
@@ -47,3 +58,12 @@ class RootDirectory(Directory):
         response.set_content_type('image/%s' % img[1])
         
         return img[0]
+
+    @export(name='comments')
+    def comments(self):
+        # TODO: send comments data
+        reponse = quixote.get_response()
+        img = image.get_latest_image()
+        response.set_content_type('text/html')
+        return
+

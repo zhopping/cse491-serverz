@@ -3,6 +3,13 @@
 {% block content %}
 Here is your image:
 <p>
-<img width=40% src='image_raw?special=latest'/>
-
+<img width=40% src='image_raw?special=latest'/><br>
+Title: {{ title }} <br>
+Description: {{ description }}<br>
+Location: {{ location }}<br>
+Date: {{ date }}<br>
+<div id="comments">
+	<h1 id="comment_header">COMMENTS</h1>
+	<p id="comments_body"></p>
+</div>
 {% endblock %}
