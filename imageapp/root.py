@@ -23,12 +23,11 @@ class RootDirectory(Directory):
 
         the_file = request.form['file']
         filetype = the_file.orig_filename.split('.')[1]
+        filename = the_file.orig_filename
         if (filetype == 'tif' or filetype == 'tiff'):
             filetype = 'tiff'
         elif filetype == 'jpeg' or filetype == 'jpg':
             filetype = 'jpg'
-        else:
-            return
         print 'received file of type: ' + filetype
         print dir(the_file)
         print 'received file with name:', the_file.base_filename
@@ -41,7 +40,7 @@ class RootDirectory(Directory):
         date = request.form['date']
         metadata = {'title':title, 'description':description, 'location':location, 'date':date}
 
-        image.add_image(data, filetype, metadata)
+        image.add_image(data, filename, filetype, metadata)
 
         return quixote.redirect('./')
 
@@ -50,6 +49,13 @@ class RootDirectory(Directory):
         metadata = image.get_latest_image()[2]
 
         return html.render('image.html', values = metadata)
+
+    @export(name='thumbnails')
+    def thumbnails(self):
+        filenames = image.get_filenames()
+        data = {'filenames':filenames}
+
+        return html.render('thumbnails.html', values = data)
 
     @export(name='image_raw')
     def image_raw(self):
@@ -60,10 +66,9 @@ class RootDirectory(Directory):
         return img[0]
 
     @export(name='comments')
-    def comments(self):
+    def comments_raw(self):
         # TODO: send comments data
         reponse = quixote.get_response()
-        img = image.get_latest_image()
         response.set_content_type('text/html')
         return
 
