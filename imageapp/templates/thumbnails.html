@@ -2,7 +2,7 @@
 
 {% block content %}
 Image Thumbnails: <br>
-{% for filename in filenames %}
-	<img src'/{{ filename }}' width=100 height=100><br><br>
+{% for image_key in keys %}
+	<img src='thumbnail' width=100 height=100><br><br>
 {% endfor %}
 {% endblock %}

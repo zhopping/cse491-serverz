@@ -5,6 +5,7 @@ from . import html, image
 
 class RootDirectory(Directory):
     _q_exports = []
+    key = 0
 
     @export(name='')                    # this makes it public.
     def index(self):
@@ -40,7 +41,7 @@ class RootDirectory(Directory):
         date = request.form['date']
         metadata = {'title':title, 'description':description, 'location':location, 'date':date}
 
-        image.add_image(data, filename, filetype, metadata)
+        image.add_image(data, filetype, metadata)
 
         return quixote.redirect('./')
 
@@ -52,10 +53,23 @@ class RootDirectory(Directory):
 
     @export(name='thumbnails')
     def thumbnails(self):
-        filenames = image.get_filenames()
-        data = {'filenames':filenames}
+        keys = image.get_keys()
+        data = {'keys':keys}
 
         return html.render('thumbnails.html', values = data)
+
+    @export(name='thumbnail')
+    def thumbnail(self):
+        print "GETTING THUMB"
+        if not image.has_key(self.key):
+            self.key = 0
+            return
+        response = quixote.get_response()
+        img = image.get_image(self.key)
+        self.key += 1
+        response.set_content_type('image/%s' % img[1])
+        
+        return img[0]
 
     @export(name='image_raw')
     def image_raw(self):
@@ -71,4 +85,22 @@ class RootDirectory(Directory):
         reponse = quixote.get_response()
         response.set_content_type('text/html')
         return
+
+    @export(name='search')
+    def search(self):
+        request = quixote.get_request()
+        query = request.form['query']
+        for key in image.get_keys():
+            if image.matches_metadata_search(key, query):
+                response = quixote.get_response()
+                img = image.get_image(key)
+                response.set_content_type('image/%s' % img[1])
+        
+                return img[0]
+
+
+    @export(name='search_result')
+    def search_result(self):
+        pass
+
 
