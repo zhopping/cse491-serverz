@@ -10,6 +10,11 @@ Location: {{ location }}<br>
 Date: {{ date }}<br>
 <div id="comments">
 	<h1 id="comment_header">COMMENTS</h1>
-	<p id="comments_body"></p>
+	<br>
+	<form enctype='multipart/form-data' action='comment_receive' method='POST'>
+	Add a comment: <input type='text' name='comment' size='40'>
+	<input type='submit' value='Add'>
+	</form>
+	<div id="comments_body"></div>
 </div>
 {% endblock %}

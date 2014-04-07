@@ -5,6 +5,7 @@ from . import html, image
 
 class RootDirectory(Directory):
     _q_exports = []
+    key = 0
 
     @export(name='')                    # this makes it public.
     def index(self):
@@ -23,12 +24,11 @@ class RootDirectory(Directory):
 
         the_file = request.form['file']
         filetype = the_file.orig_filename.split('.')[1]
+        filename = the_file.orig_filename
         if (filetype == 'tif' or filetype == 'tiff'):
             filetype = 'tiff'
         elif filetype == 'jpeg' or filetype == 'jpg':
             filetype = 'jpg'
-        else:
-            return
         print 'received file of type: ' + filetype
         print dir(the_file)
         print 'received file with name:', the_file.base_filename
@@ -51,6 +51,26 @@ class RootDirectory(Directory):
 
         return html.render('image.html', values = metadata)
 
+    @export(name='thumbnails')
+    def thumbnails(self):
+        keys = image.get_keys()
+        data = {'keys':keys}
+
+        return html.render('thumbnails.html', values = data)
+
+    @export(name='thumbnail')
+    def thumbnail(self):
+        print "GETTING THUMB"
+        if not image.has_key(self.key):
+            self.key = 0
+            return
+        response = quixote.get_response()
+        img = image.get_image(self.key)
+        self.key += 1
+        response.set_content_type('image/%s' % img[1])
+        
+        return img[0]
+
     @export(name='image_raw')
     def image_raw(self):
         response = quixote.get_response()
@@ -60,10 +80,27 @@ class RootDirectory(Directory):
         return img[0]
 
     @export(name='comments')
-    def comments(self):
+    def comments_raw(self):
         # TODO: send comments data
         reponse = quixote.get_response()
-        img = image.get_latest_image()
         response.set_content_type('text/html')
         return
+
+    @export(name='search')
+    def search(self):
+        request = quixote.get_request()
+        query = request.form['query']
+        for key in image.get_keys():
+            if image.matches_metadata_search(key, query):
+                response = quixote.get_response()
+                img = image.get_image(key)
+                response.set_content_type('image/%s' % img[1])
+        
+                return img[0]
+
+
+    @export(name='search_result')
+    def search_result(self):
+        pass
+
 

@@ -30,3 +30,8 @@
  * Image filetype and the actual image data are stored upon upload
  * Can specify application and port via command line argument for apps run on server
  * Added twill test for app.py
+
+ 2014-04-02  Zachary Hopping <hoppingz@msu.edu>
+ * Imageapp now supports image metadata storage.
+ * EXTREMELY basic metadata search implemented.  If a query term is found in any image's description, location, or title, the image is displayed when the search is submitted.  This will be improved.
+ * Thumbnails page displays a series of thumbnails of all uploaded images.
