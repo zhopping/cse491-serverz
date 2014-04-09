@@ -2,6 +2,7 @@ import quixote
 from quixote.directory import Directory, export, subdir
 
 from . import html, image
+from image import Image
 
 class RootDirectory(Directory):
     _q_exports = []
@@ -41,20 +42,39 @@ class RootDirectory(Directory):
     @export(name='image')
     def image(self):
         request = quixote.get_request()
-        key = request.form[key]
+        key = request.form['key']
         metadata = image.get_image(key).metadata
 
         return html.render('image.html', values = metadata)
 
-    @export(name='image')
+    @export(name='image_with_key')
+    def image_with_key(self):
+        request = quixote.get_request()
+        key = request.form['key']
+        data = image.get_image(key).metadata
+        data['key'] = key
+
+        return html.render('image.html', values = data)
+
+    @export(name='image_latest')
     def image_latest(self):
         metadata = image.get_latest_image().metadata
 
         return html.render('image.html', values = metadata)
 
+    @export(name='image_raw_latest')
+    def image_raw_latest(self):
+        response = quixote.get_response()
+        img = image.get_latest_image()
+        response.set_content_type('image/%s' % img.filetype)
+        
+        return img.data
+
     @export(name='thumbnails')
     def thumbnails(self):
-        num_images = image.num_images
+        num_images = image.num_images()
+        print 'NUM IMAGES:'
+        print num_images
         data = {'image_keys':[i for i in range(num_images)]}
 
         return html.render('thumbnails.html', values = data)
@@ -62,7 +82,7 @@ class RootDirectory(Directory):
     @export(name='image_raw')
     def image_raw(self):
         request = quixote.get_request()
-        key = request.form[key]
+        key = request.form['key']
         response = quixote.get_response()
         img = image.get_image(key)
         response.set_content_type('image/%s' % img.filetype)
@@ -72,7 +92,7 @@ class RootDirectory(Directory):
     @export(name='comments')
     def comments(self):
         request = quixote.get_request()
-        key = request.form[key]
+        key = request.form['key']
         response = quixote.get_response()
         coms = image.get_comments(key)
         return 'COMMENT LOL DOGE'
@@ -81,7 +101,7 @@ class RootDirectory(Directory):
     @export(name='search_results')
     def search_results(self):
         request = quixote.get_request()
-        query = request.form[query]
+        query = request.form['query']
         data = {'image_keys':image.search_metadata(query)}
 
         return html.render('search_results.html', values = data)

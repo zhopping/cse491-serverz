@@ -1,62 +1,84 @@
 # image handling API
 import sqlite3
 
-db = sqlite3.connect('images.sqlite')
-# configure to retrieve bytes, not text
-db.text_factory = bytes
-c = db.cursor()
-
 class Image:
 	def __init__(self, data, filetype, metadata):
 		self.data = data
-		if (filetype == 'tif' or filetype == 'tiff'):
-            self.filetype = 'tiff'
-        elif filetype == 'jpeg' or filetype == 'jpg':
-            self.filetype = 'jpg'
-        else:
-        	self.filetype = filetype
 		self.metadata = metadata
 
+		if (filetype == 'tif' or filetype == 'tiff'):
+			self.filetype = 'tiff'
+		elif (filetype == 'jpeg' or filetype == 'jpg'):
+			self.filetype = 'jpg'
+		else:
+			self.filetype = filetype
 
-def add_image(image): 
-    db.execute('INSERT INTO image_store (image) VALUES (?)', (image,))
+
+def add_image(image):
+	db = sqlite3.connect('images.sqlite')
+	db.text_factory = bytes
+	db.execute('INSERT INTO image_store (image, filetype, title, '
+		'description, date_taken, location) VALUES (?,?,?,?,?,?)', 
+	(image.data, image.filetype, image.metadata['title'], image.metadata['description'], 
+		image.metadata['date'], image.metadata['location']))
 	db.commit()
+	db.close()
 
 def get_image(index):
-	c.execute('SELECT image FROM image_store WHERE i=%s' % index)
+	db = sqlite3.connect('images.sqlite')
+	db.text_factory = bytes
+	c = db.cursor()
+	c.execute('SELECT image, filetype, title, description, date_taken, location FROM image_store WHERE i=%s' % index)
 
-	i,image = c.fetchone()
+	image, filetype, title, description, date_taken, location = c.fetchone()
+	img = Image(image, filetype, {'title':title, 'description':description, 'location':location, 'date':date_taken})
+	db.close()
 
-	return image
+	return img
 
 def num_images():
-	c.execute('SELECT i FROM image_store')
-	return c.rowcount
+	db = sqlite3.connect('images.sqlite')
+	db.text_factory = bytes
+	c = db.cursor()
+	c.execute('SELECT i FROM image_store ORDER BY i DESC')
+	i = c.fetchone()
+	db.close()
+	return i[0]
 
 
 def get_latest_image():
-	c.execute('SELECT image FROM image_store ORDER BY i DESC LIMIT 1')
-	image = c.fetchone()
-	return image
+	db = sqlite3.connect('images.sqlite')
+	db.text_factory = bytes
+	c = db.cursor()
+	c.execute('SELECT image, filetype, title, description, date_taken, location FROM image_store ORDER BY i DESC LIMIT 1')
+
+	image, filetype, title, description, date_taken, location = c.fetchone()
+	img = Image(image, filetype, {'title':title, 'description':description, 'location':location, 'date':date_taken})
+	db.close()
+	return img
 
 def matches_metadata(metadata, query):
-	for value in metadata.itervalues():
+	for value in metadata:
 		if query in value:
 			return True
 	return False
 
 
 def search_metadata(query):
+	db = sqlite3.connect('images.sqlite')
+	db.text_factory = bytes
+	c = db.cursor()
 	#returns matching rows in database as array of integers
 	results = []
-	c.execute('SELECT image FROM image_store ORDER BY i ASC')
+	c.execute('SELECT title, description, location FROM image_store ORDER BY i ASC')
 
 	row = 0
-	all_images = c.fetchall()
-	for (image in all_images):
-		if matches_metadata(image.metadata, query):
+	all_metadata = c.fetchall()
+	for metadata in all_metadata:
+		if matches_metadata(metadata, query):
 			results.append(row)
 		row += 1
+	db.close()
 	return results
 
 

@@ -2,16 +2,16 @@
 
 {% block content %}
 <a href='upload'>Upload an image</a> |
-<a href='image'>Show most recent image</a> |
+<a href='image_latest'>Show most recent image</a> |
 <a href='thumbnails'>View image thumbnails</a>
 <br>
-<form enctype='multipart/form-data' action='search' method='POST'>
+<form enctype='multipart/form-data' action='search_results' method='POST'>
 Metadata Search: <input type='text' name='query' size='40'><br>
 <input type='submit' value='Search Image Metadata'>
 </form>
 <br>
 <p>
-<img width=40% src='image_raw?special=latest'/><br>
+<img width=40% src='image_raw_latest'/><br>
 Title: {{ title }} <br>
 Description: {{ description }}<br>
 Location: {{ location }}<br>
