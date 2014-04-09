@@ -35,3 +35,9 @@
  * Imageapp now supports image metadata storage.
  * EXTREMELY basic metadata search implemented.  If a query term is found in any image's description, location, or title, the image is displayed when the search is submitted.  This will be improved.
  * Thumbnails page displays a series of thumbnails of all uploaded images.
+
+ 2014-04-08  Zachary Hopping <hoppingz@msu.edu>
+ * All image data, including metadata and filetype, is now stored in an sqlite database.
+ * Major refactoring of image.py and root.py to integrate database support.
+ * Image data now stored in Image class.
+ * Major changes to templates to allow display of search results and thumbnails.
