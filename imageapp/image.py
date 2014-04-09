@@ -43,6 +43,8 @@ def num_images():
 	c.execute('SELECT i FROM image_store ORDER BY i DESC')
 	i = c.fetchone()
 	db.close()
+	if i is None:
+		return 0
 	return i[0]
 
 

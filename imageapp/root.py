@@ -54,7 +54,7 @@ class RootDirectory(Directory):
         data = image.get_image(key).metadata
         data['key'] = key
 
-        return html.render('image.html', values = data)
+        return html.render('image_with_key.html', values = data)
 
     @export(name='image_latest')
     def image_latest(self):
@@ -75,7 +75,7 @@ class RootDirectory(Directory):
         num_images = image.num_images()
         print 'NUM IMAGES:'
         print num_images
-        data = {'image_keys':[i for i in range(num_images)]}
+        data = {'image_keys':[i+1 for i in range(num_images)]}
 
         return html.render('thumbnails.html', values = data)
 
