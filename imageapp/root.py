@@ -5,11 +5,10 @@ from . import html, image
 
 class RootDirectory(Directory):
     _q_exports = []
-    key = 0
 
     @export(name='')                    # this makes it public.
     def index(self):
-        metadata = image.get_latest_image()[2]
+        metadata = image.get_latest_image().metadata
 
         return html.render('index.html', values=metadata)
 
@@ -20,15 +19,9 @@ class RootDirectory(Directory):
     @export(name='upload_receive')
     def upload_receive(self):
         request = quixote.get_request()
-        print request.form.keys()
 
         the_file = request.form['file']
         filetype = the_file.orig_filename.split('.')[1]
-        filename = the_file.orig_filename
-        if (filetype == 'tif' or filetype == 'tiff'):
-            filetype = 'tiff'
-        elif filetype == 'jpeg' or filetype == 'jpg':
-            filetype = 'jpg'
         print 'received file of type: ' + filetype
         print dir(the_file)
         print 'received file with name:', the_file.base_filename
@@ -40,67 +33,57 @@ class RootDirectory(Directory):
         location = request.form['location']
         date = request.form['date']
         metadata = {'title':title, 'description':description, 'location':location, 'date':date}
-
-        image.add_image(data, filetype, metadata)
+        img = Image(data, filetype, metadata)
+        image.add_image(img)
 
         return quixote.redirect('./')
 
     @export(name='image')
     def image(self):
-        metadata = image.get_latest_image()[2]
+        request = quixote.get_request()
+        key = request.form[key]
+        metadata = image.get_image(key).metadata
+
+        return html.render('image.html', values = metadata)
+
+    @export(name='image')
+    def image_latest(self):
+        metadata = image.get_latest_image().metadata
 
         return html.render('image.html', values = metadata)
 
     @export(name='thumbnails')
     def thumbnails(self):
-        keys = image.get_keys()
-        data = {'keys':keys}
+        num_images = image.num_images
+        data = {'image_keys':[i for i in range(num_images)]}
 
         return html.render('thumbnails.html', values = data)
 
-    @export(name='thumbnail')
-    def thumbnail(self):
-        print "GETTING THUMB"
-        if not image.has_key(self.key):
-            self.key = 0
-            return
-        response = quixote.get_response()
-        img = image.get_image(self.key)
-        self.key += 1
-        response.set_content_type('image/%s' % img[1])
-        
-        return img[0]
-
     @export(name='image_raw')
     def image_raw(self):
+        request = quixote.get_request()
+        key = request.form[key]
         response = quixote.get_response()
-        img = image.get_latest_image()
-        response.set_content_type('image/%s' % img[1])
+        img = image.get_image(key)
+        response.set_content_type('image/%s' % img.filetype)
         
-        return img[0]
+        return img.data
 
     @export(name='comments')
-    def comments_raw(self):
-        # TODO: send comments data
-        reponse = quixote.get_response()
-        response.set_content_type('text/html')
-        return
-
-    @export(name='search')
-    def search(self):
+    def comments(self):
         request = quixote.get_request()
-        query = request.form['query']
-        for key in image.get_keys():
-            if image.matches_metadata_search(key, query):
-                response = quixote.get_response()
-                img = image.get_image(key)
-                response.set_content_type('image/%s' % img[1])
-        
-                return img[0]
+        key = request.form[key]
+        response = quixote.get_response()
+        coms = image.get_comments(key)
+        return 'COMMENT LOL DOGE'
 
 
-    @export(name='search_result')
-    def search_result(self):
-        pass
+    @export(name='search_results')
+    def search_results(self):
+        request = quixote.get_request()
+        query = request.form[query]
+        data = {'image_keys':image.search_metadata(query)}
+
+        return html.render('search_results.html', values = data)
 
 

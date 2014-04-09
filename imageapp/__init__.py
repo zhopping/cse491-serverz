@@ -1,6 +1,7 @@
 # __init__.py is the top level file in a Python package.
 
 from quixote.publish import Publisher
+import os.path
 
 # this imports the class RootDirectory from the file 'root.py'
 from .root import RootDirectory
@@ -12,6 +13,11 @@ def create_publisher():
      return p
  
 def setup():                            # stuff that should be run once.
+	if not os.path.exists("images.sqlite"):
+		db = sqlite3.connect('images.sqlite')
+		db.execute('CREATE TABLE image_store (i INTEGER PRIMARY KEY, image BLOB, comments BLOB)');
+		db.commit()
+		db.close()
     html.init_templates()
 
     some_data = open('imageapp/dice.png', 'rb').read()

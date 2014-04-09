@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-Image Thumbnails: <br>
+Search Results: <br>
 {% for key in image_keys %}
 	<a href='image_with_key?key={{ key }}'>
 	<img src='image_raw?key={{ key }}' width=100 height=100>
