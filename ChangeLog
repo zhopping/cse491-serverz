@@ -41,3 +41,8 @@
  * Major refactoring of image.py and root.py to integrate database support.
  * Image data now stored in Image class.
  * Major changes to templates to allow display of search results and thumbnails.
+
+ 2014-04-09  Zachary Hopping <hoppingz@msu.edu>
+ * Comments are now stored in SQLite database.
+ * Images may be commented on and comments persist.
+ * Clicking on a thumbnail redirects to the main page for an image.

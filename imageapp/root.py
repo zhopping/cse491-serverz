@@ -11,7 +11,7 @@ class RootDirectory(Directory):
     def index(self):
         data = image.get_latest_image().metadata
         comments = image.get_latest_image_comments()
-        metadata['image_comments'] = comments
+        data['image_comments'] = comments
 
         return html.render('index.html', values=data)
 
@@ -47,7 +47,7 @@ class RootDirectory(Directory):
         key = request.form['key']
         data = image.get_image(key).metadata
         comments = image.get_comments(key)
-        metadata['image_comments'] = comments
+        data['image_comments'] = comments
 
         return html.render('image.html', values = data)
 
@@ -57,14 +57,16 @@ class RootDirectory(Directory):
         key = request.form['key']
         data = image.get_image(key).metadata
         data['key'] = key
+        data['image_comments'] = image.get_comments(key)
 
         return html.render('image_with_key.html', values = data)
 
     @export(name='image_latest')
     def image_latest(self):
-        metadata = image.get_latest_image().metadata
+        data = image.get_latest_image().metadata
+        data['image_comments'] = image.get_latest_image_comments()
 
-        return html.render('image.html', values = metadata)
+        return html.render('image.html', values = data)
 
     @export(name='image_raw_latest')
     def image_raw_latest(self):
@@ -99,12 +101,14 @@ class RootDirectory(Directory):
         key = request.form['key']
         comment = request.form['comment']
         image.add_comment(key, comment)
+        return quixote.redirect('./image_with_key?key=%s' % key)
 
     @export(name="add_comment_latest")
     def add_comment_latest(self):
         request = quixote.get_request()
         comment = request.form['comment']
         image.add_comment_latest(comment)
+        return quixote.redirect('./')
 
     @export(name='search_results')
     def search_results(self):

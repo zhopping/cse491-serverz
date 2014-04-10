@@ -11,7 +11,7 @@ Date: {{ date }}<br>
 <div id="comments">
 	<h1 id="comment_header">COMMENTS</h1>
 	<br>
-	<form enctype='multipart/form-data' action='comment_receive' method='POST'>
+	<form enctype='multipart/form-data' action='add_comment?key={{ key }}' method='POST'>
 	Add a comment: <input type='text' name='comment' size='40'>
 	<input type='submit' value='Add'>
 	</form>
