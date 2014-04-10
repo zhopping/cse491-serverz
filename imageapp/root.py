@@ -9,9 +9,11 @@ class RootDirectory(Directory):
 
     @export(name='')                    # this makes it public.
     def index(self):
-        metadata = image.get_latest_image().metadata
+        data = image.get_latest_image().metadata
+        comments = image.get_latest_image_comments()
+        metadata['image_comments'] = comments
 
-        return html.render('index.html', values=metadata)
+        return html.render('index.html', values=data)
 
     @export(name='upload')
     def upload(self):
@@ -43,9 +45,11 @@ class RootDirectory(Directory):
     def image(self):
         request = quixote.get_request()
         key = request.form['key']
-        metadata = image.get_image(key).metadata
+        data = image.get_image(key).metadata
+        comments = image.get_comments(key)
+        metadata['image_comments'] = comments
 
-        return html.render('image.html', values = metadata)
+        return html.render('image.html', values = data)
 
     @export(name='image_with_key')
     def image_with_key(self):
@@ -89,14 +93,18 @@ class RootDirectory(Directory):
         
         return img.data
 
-    @export(name='comments')
-    def comments(self):
+    @export(name='add_comment')
+    def add_comment(self):
         request = quixote.get_request()
         key = request.form['key']
-        response = quixote.get_response()
-        coms = image.get_comments(key)
-        return 'COMMENT LOL DOGE'
+        comment = request.form['comment']
+        image.add_comment(key, comment)
 
+    @export(name="add_comment_latest")
+    def add_comment_latest(self):
+        request = quixote.get_request()
+        comment = request.form['comment']
+        image.add_comment_latest(comment)
 
     @export(name='search_results')
     def search_results(self):

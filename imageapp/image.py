@@ -18,9 +18,29 @@ def add_image(image):
 	db = sqlite3.connect('images.sqlite')
 	db.text_factory = bytes
 	db.execute('INSERT INTO image_store (image, filetype, title, '
-		'description, date_taken, location) VALUES (?,?,?,?,?,?)', 
+		'description, date_taken, location, comments) VALUES (?,?,?,?,?,?,?)', 
 	(image.data, image.filetype, image.metadata['title'], image.metadata['description'], 
-		image.metadata['date'], image.metadata['location']))
+		image.metadata['date'], image.metadata['location'], ''))
+	db.commit()
+	db.close()
+
+def add_comment(index, comment):
+	comments = self.get_comments(index)
+	comments_as_string = comments.join('::')
+	commments = comments + '::' + comment
+	db = sqlite3.connect('images.sqlite')
+	db.text_factory = bytes
+	db.execute('UPDATE image_store SET comments=%s WHERE i=%s' % (comments, index), (comments))
+	db.commit()
+	db.close()
+
+def add_comment_latest(comment):
+	comments = self.get_latest_image_comments()
+	comments_as_string = comments.join('::')
+	commments = comments + '::' + comment
+	db = sqlite3.connect('images.sqlite')
+	db.text_factory = bytes
+	db.execute('UPDATE image_store SET comments=%s WHERE i=1' % (comments, index), (comments))
 	db.commit()
 	db.close()
 
@@ -35,6 +55,30 @@ def get_image(index):
 	db.close()
 
 	return img
+
+# returns comments for a given image index as a list of strings
+def get_comments(index):
+	db = sqlite3.connect('images.sqlite')
+	db.text_factory = bytes
+	c = db.cursor()
+	c.execute('SELECT comments FROM image_store WHERE i=%s' % index)
+
+	comments = c.fetchone()
+	comments_as_list = comments.split('::')
+	db.close()
+
+	return comments_as_list
+
+def get_latest_image_comments():
+	db = sqlite3.connect('images.sqlite')
+	db.text_factory = bytes
+	c = db.cursor()
+	c.execute('SELECT comments FROM image_store ORDER BY i DESC LIMIT 1')
+
+	comments = c.fetchone()
+	comments_as_list = comments.split('::')
+	db.close()
+	return comments_as_list
 
 def num_images():
 	db = sqlite3.connect('images.sqlite')

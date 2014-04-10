@@ -16,5 +16,10 @@ Date: {{ date }}<br>
 	<input type='submit' value='Add'>
 	</form>
 	<div id="comments_body"></div>
+	<ol>
+		{% for comment in image_comments %}
+			<li>{{ comment }}</li>
+		{% endfor %}
+		</ol>
 </div>
 {% endblock %}
