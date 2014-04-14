@@ -46,3 +46,8 @@
  * Comments are now stored in SQLite database.
  * Images may be commented on and comments persist.
  * Clicking on a thumbnail redirects to the main page for an image.
+
+ 2014-04-09  Zachary Hopping <hoppingz@msu.edu>
+ * Commenting now works properly.
+ * Specific images can be referenced by including the key in the URL, as in 
+ hostname:port/image_with_key?key=1 for the first image uploaded.
