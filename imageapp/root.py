@@ -79,8 +79,6 @@ class RootDirectory(Directory):
     @export(name='thumbnails')
     def thumbnails(self):
         num_images = image.num_images()
-        print 'NUM IMAGES:'
-        print num_images
         data = {'image_keys':[i+1 for i in range(num_images)]}
 
         return html.render('thumbnails.html', values = data)
@@ -100,14 +98,14 @@ class RootDirectory(Directory):
         request = quixote.get_request()
         key = request.form['key']
         comment = request.form['comment']
-        image.add_comment(key, comment)
+        image.add_comment_at_index(key, comment)
         return quixote.redirect('./image_with_key?key=%s' % key)
 
     @export(name="add_comment_latest")
     def add_comment_latest(self):
         request = quixote.get_request()
         comment = request.form['comment']
-        image.add_comment_latest(comment)
+        image.add_comment_to_latest_upload(comment)
         return quixote.redirect('./')
 
     @export(name='search_results')

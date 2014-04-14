@@ -24,23 +24,23 @@ def add_image(image):
 	db.commit()
 	db.close()
 
-def add_comment(index, comment):
+def add_comment_at_index(index, comment):
 	comments = get_comments(index)
 	comments_as_string = '::'.join(comments)
-	commments_as_string = comments_as_string + '::' + comment
+	comments_as_string = comments_as_string + comment + '::'
 	db = sqlite3.connect('images.sqlite')
 	db.text_factory = bytes
-	db.execute("UPDATE image_store SET comments='%s' WHERE i='%s'" % (comments_as_string, index))
+	db.execute("UPDATE image_store SET comments=\'%s\' WHERE i=%s" % (comments_as_string, index))
 	db.commit()
 	db.close()
 
-def add_comment_latest(comment):
+def add_comment_to_latest_upload(comment):
 	comments = get_latest_image_comments()
 	comments_as_string = '::'.join(comments)
-	commments_as_string = comments_as_string + '::' + comment
+	comments_as_string = comments_as_string + comment + '::'
 	db = sqlite3.connect('images.sqlite')
 	db.text_factory = bytes
-	db.execute("UPDATE image_store SET comments='%s' WHERE i='1'" % comments_as_string)
+	db.execute("UPDATE image_store SET comments=\'%s\' WHERE i=1" % comments_as_string)
 	db.commit()
 	db.close()
 
@@ -64,11 +64,12 @@ def get_comments(index):
 	c.execute('SELECT comments FROM image_store WHERE i=%s' % index)
 
 	comments = c.fetchone()[0]
-	if comments is None:
-		comments_as_list = []
+	db.close()
+	if (comments is None or not comments):
+		return []
 	else:
 		comments_as_list = comments.split('::')
-	db.close()
+	
 	return comments_as_list
 
 def get_latest_image_comments():
@@ -78,11 +79,11 @@ def get_latest_image_comments():
 	c.execute('SELECT comments FROM image_store ORDER BY i DESC LIMIT 1')
 
 	comments = c.fetchone()[0]
-	if comments is None:
-		comments_as_list = []
+	db.close()
+	if (comments is None or not comments):
+		return []
 	else:
 		comments_as_list = comments.split('::')
-	db.close()
 	return comments_as_list
 
 def num_images():
