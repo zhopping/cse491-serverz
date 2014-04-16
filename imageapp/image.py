@@ -26,7 +26,12 @@ def add_image(image):
 
 def add_comment_at_index(index, comment):
 	comments = get_comments(index)
-	comments_as_string = '::'.join(comments)
+	if len(comments) == 1:
+		comments_as_string = comments[0] + '::'
+	elif len(comments) == 0:
+		comments_as_string = ''
+	else:
+		comments_as_string = '::'.join(comments) + '::'
 	comments_as_string = comments_as_string + comment + '::'
 	db = sqlite3.connect('images.sqlite')
 	db.text_factory = bytes
@@ -35,14 +40,7 @@ def add_comment_at_index(index, comment):
 	db.close()
 
 def add_comment_to_latest_upload(comment):
-	comments = get_latest_image_comments()
-	comments_as_string = '::'.join(comments)
-	comments_as_string = comments_as_string + comment + '::'
-	db = sqlite3.connect('images.sqlite')
-	db.text_factory = bytes
-	db.execute("UPDATE image_store SET comments=\'%s\' WHERE i=1" % comments_as_string)
-	db.commit()
-	db.close()
+	add_comment_at_index(num_images(), comment)
 
 def get_image(index):
 	db = sqlite3.connect('images.sqlite')
@@ -70,7 +68,7 @@ def get_comments(index):
 	else:
 		comments_as_list = comments.split('::')
 	
-	return comments_as_list
+	return comments_as_list[:-1]
 
 def get_latest_image_comments():
 	db = sqlite3.connect('images.sqlite')
@@ -84,7 +82,7 @@ def get_latest_image_comments():
 		return []
 	else:
 		comments_as_list = comments.split('::')
-	return comments_as_list
+	return comments_as_list[:-1]
 
 def num_images():
 	db = sqlite3.connect('images.sqlite')
@@ -132,5 +130,3 @@ def search_metadata(query):
 		row += 1
 	db.close()
 	return results
-
-
