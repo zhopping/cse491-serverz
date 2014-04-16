@@ -24,6 +24,7 @@ import imageapp
 from wsgiref.validate import validator
 from chat.apps import ChatApp
 from quotes.apps import QuotesApp
+import cookieapp
 
 # global variables for command line app argument input
 _app_init_complete = False
@@ -32,8 +33,9 @@ MY_APP = 'myapp'
 QUIXOTE_ALTDEMO_APP = 'altdemo'
 CHAT_APP = 'chat'
 QUOTES_APP = 'quotes'
+COOKIE_APP = 'cookie'
 
-VALID_APPS = [QUIXOTE_ALTDEMO_APP, MY_APP, IMAGE_APP, CHAT_APP, QUOTES_APP]
+VALID_APPS = [QUIXOTE_ALTDEMO_APP, MY_APP, IMAGE_APP, CHAT_APP, QUOTES_APP, COOKIE_APP]
 
 # parse command line arguments
 parser = argparse.ArgumentParser(description="Process app name and port args")
@@ -63,6 +65,8 @@ def init_app(current_app):
         return ChatApp('./chat/html')
     elif (current_app == QUOTES_APP):
         return QuotesApp('./quotes/quotes.txt', './quotes/html')
+    elif (current_app == COOKIE_APP):
+        return cookieapp.wsgi_app
 
 
 def main(socket_module = socket):

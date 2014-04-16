@@ -3,7 +3,7 @@
 {% block content %}
 Here is your image:
 <p>
-<img width=40% src='image_raw_latest'/><br>
+<img width=40% src='image_raw?key={{ key }}'/><br>
 Title: {{ title }} <br>
 Description: {{ description }}<br>
 Location: {{ location }}<br>
@@ -11,16 +11,15 @@ Date: {{ date }}<br>
 <div id="comments">
 	<h1 id="comment_header">COMMENTS</h1>
 	<br>
-	<form enctype='multipart/form-data' action='add_comment_latest' method='POST'>
+	<form enctype='multipart/form-data' action='add_comment?key={{ key }}' method='POST'>
 	Add a comment: <input type='text' name='comment' size='40'>
 	<input type='submit' value='Add'>
 	</form>
-	<div id="comments_body">
-		<ol>
+	<div id="comments_body"></div>
+	<ol>
 		{% for comment in image_comments %}
 			<li>{{ comment }}</li>
 		{% endfor %}
 		</ol>
-	</div>
 </div>
 {% endblock %}

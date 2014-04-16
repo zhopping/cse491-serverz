@@ -2,16 +2,18 @@ import quixote
 from quixote.directory import Directory, export, subdir
 
 from . import html, image
+from image import Image
 
 class RootDirectory(Directory):
     _q_exports = []
-    key = 0
 
     @export(name='')                    # this makes it public.
     def index(self):
-        metadata = image.get_latest_image()[2]
+        data = image.get_latest_image().metadata
+        comments = image.get_latest_image_comments()
+        data['image_comments'] = comments
 
-        return html.render('index.html', values=metadata)
+        return html.render('index.html', values=data)
 
     @export(name='upload')
     def upload(self):
@@ -20,15 +22,9 @@ class RootDirectory(Directory):
     @export(name='upload_receive')
     def upload_receive(self):
         request = quixote.get_request()
-        print request.form.keys()
 
         the_file = request.form['file']
         filetype = the_file.orig_filename.split('.')[1]
-        filename = the_file.orig_filename
-        if (filetype == 'tif' or filetype == 'tiff'):
-            filetype = 'tiff'
-        elif filetype == 'jpeg' or filetype == 'jpg':
-            filetype = 'jpg'
         print 'received file of type: ' + filetype
         print dir(the_file)
         print 'received file with name:', the_file.base_filename
@@ -40,67 +36,84 @@ class RootDirectory(Directory):
         location = request.form['location']
         date = request.form['date']
         metadata = {'title':title, 'description':description, 'location':location, 'date':date}
-
-        image.add_image(data, filetype, metadata)
+        img = Image(data, filetype, metadata)
+        image.add_image(img)
 
         return quixote.redirect('./')
 
     @export(name='image')
     def image(self):
-        metadata = image.get_latest_image()[2]
+        request = quixote.get_request()
+        key = request.form['key']
+        data = image.get_image(key).metadata
+        comments = image.get_comments(key)
+        data['image_comments'] = comments
 
-        return html.render('image.html', values = metadata)
+        return html.render('image.html', values = data)
+
+    @export(name='image_with_key')
+    def image_with_key(self):
+        request = quixote.get_request()
+        key = request.form['key']
+        data = image.get_image(key).metadata
+        data['key'] = key
+        data['image_comments'] = image.get_comments(key)
+
+        return html.render('image_with_key.html', values = data)
+
+    @export(name='image_latest')
+    def image_latest(self):
+        data = image.get_latest_image().metadata
+        data['image_comments'] = image.get_latest_image_comments()
+
+        return html.render('image.html', values = data)
+
+    @export(name='image_raw_latest')
+    def image_raw_latest(self):
+        response = quixote.get_response()
+        img = image.get_latest_image()
+        response.set_content_type('image/%s' % img.filetype)
+        
+        return img.data
 
     @export(name='thumbnails')
     def thumbnails(self):
-        keys = image.get_keys()
-        data = {'keys':keys}
+        num_images = image.num_images()
+        data = {'image_keys':[i+1 for i in range(num_images)]}
 
         return html.render('thumbnails.html', values = data)
 
-    @export(name='thumbnail')
-    def thumbnail(self):
-        print "GETTING THUMB"
-        if not image.has_key(self.key):
-            self.key = 0
-            return
-        response = quixote.get_response()
-        img = image.get_image(self.key)
-        self.key += 1
-        response.set_content_type('image/%s' % img[1])
-        
-        return img[0]
-
     @export(name='image_raw')
     def image_raw(self):
+        request = quixote.get_request()
+        key = request.form['key']
         response = quixote.get_response()
-        img = image.get_latest_image()
-        response.set_content_type('image/%s' % img[1])
+        img = image.get_image(key)
+        response.set_content_type('image/%s' % img.filetype)
         
-        return img[0]
+        return img.data
 
-    @export(name='comments')
-    def comments_raw(self):
-        # TODO: send comments data
-        reponse = quixote.get_response()
-        response.set_content_type('text/html')
-        return
+    @export(name='add_comment')
+    def add_comment(self):
+        request = quixote.get_request()
+        key = request.form['key']
+        comment = request.form['comment']
+        image.add_comment_at_index(key, comment)
+        return quixote.redirect('./image_with_key?key=%s' % key)
 
-    @export(name='search')
-    def search(self):
+    @export(name="add_comment_latest")
+    def add_comment_latest(self):
+        request = quixote.get_request()
+        comment = request.form['comment']
+        image.add_comment_to_latest_upload(comment)
+        return quixote.redirect('./')
+
+    @export(name='search_results')
+    def search_results(self):
         request = quixote.get_request()
         query = request.form['query']
-        for key in image.get_keys():
-            if image.matches_metadata_search(key, query):
-                response = quixote.get_response()
-                img = image.get_image(key)
-                response.set_content_type('image/%s' % img[1])
-        
-                return img[0]
+        data = {'image_keys':image.search_metadata(query)}
 
-
-    @export(name='search_result')
-    def search_result(self):
-        pass
+        return html.render('search_results.html', values = data)
 
 
