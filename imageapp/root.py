@@ -5,7 +5,6 @@ from . import html, image, accountmanager
 from image import Image
 from accountmanager import Account
 
-
 class RootDirectory(Directory):
     _q_exports = []
 
@@ -33,7 +32,7 @@ class RootDirectory(Directory):
         password = request.form['password']
         account = Account(user, password)
         if accountmanager.exists_username(user):
-            return quixote.redirect('./account_name_taken.html')
+            return self.account_name_taken()
         accountmanager.add_account(account)
         quixote.get_response().set_cookie('user', user, path='/')
         return quixote.redirect('./')
@@ -56,7 +55,7 @@ class RootDirectory(Directory):
             response = quixote.get_response()
             response.set_cookie('user', user, path='/')
             return quixote.redirect('./')
-        return quixote.redirect('./invalid_login.html')
+        return self.invalid_login()
 
     @export(name='logout')
     def logout(self):
