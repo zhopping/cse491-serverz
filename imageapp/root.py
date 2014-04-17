@@ -1,8 +1,9 @@
 import quixote
 from quixote.directory import Directory, export, subdir
 
-from . import html, image
+from . import html, image, accountmanager
 from image import Image
+from accountmanager import Account
 
 class RootDirectory(Directory):
     _q_exports = []
@@ -12,12 +13,54 @@ class RootDirectory(Directory):
         data = image.get_latest_image().metadata
         comments = image.get_latest_image_comments()
         data['image_comments'] = comments
-
+        current_user = quixote.get_request().get_cookie('user')
+        if (current_user is not None):
+            data['user'] = current_user
         return html.render('index.html', values=data)
 
     @export(name='upload')
     def upload(self):
+        current_user = quixote.get_request().get_cookie('user')
+        if (current_user is not None):
+            data['user'] = current_user
         return html.render('upload.html')
+
+    @export(name='create_account')
+    def create_account(self):
+        request = quixote.get_request()
+        user = request.form['username']
+        password = request.form['password']
+        account = Account(user, password)
+        if accountmanager.exists_username(user):
+            return self.account_name_taken()
+        accountmanager.add_account(account)
+        quixote.get_response().set_cookie('user', user, path='/')
+        return quixote.redirect('./')
+
+    @export(name='account_name_taken')
+    def account_name_taken(self):
+        return html.render('account_name_taken.html')
+
+    @export(name='invalid_login')
+    def invalid_login(self):
+        return html.render('invalid_login.html')
+
+    @export(name='login')
+    def login(self):
+        request = quixote.get_request()
+        user = request.form['username']
+        password = request.form['password']
+        account = Account(user, password)
+        if accountmanager.is_valid_login(account):
+            response = quixote.get_response()
+            response.set_cookie('user', user, path='/')
+            return quixote.redirect('./')
+        return self.invalid_login()
+
+    @export(name='logout')
+    def logout(self):
+        quixote.get_response().expire_cookie('user', path='/')
+        return quixote.redirect('./')
 
     @export(name='upload_receive')
     def upload_receive(self):
@@ -48,6 +91,9 @@ class RootDirectory(Directory):
         data = image.get_image(key).metadata
         comments = image.get_comments(key)
         data['image_comments'] = comments
+        current_user = quixote.get_request().get_cookie('user')
+        if (current_user is not None):
+            data['user'] = current_user
 
         return html.render('image.html', values = data)
 
@@ -58,6 +104,9 @@ class RootDirectory(Directory):
         data = image.get_image(key).metadata
         data['key'] = key
         data['image_comments'] = image.get_comments(key)
+        current_user = quixote.get_request().get_cookie('user')
+        if (current_user is not None):
+            data['user'] = current_user
 
         return html.render('image_with_key.html', values = data)
 
@@ -65,6 +114,9 @@ class RootDirectory(Directory):
     def image_latest(self):
         data = image.get_latest_image().metadata
         data['image_comments'] = image.get_latest_image_comments()
+        current_user = quixote.get_request().get_cookie('user')
+        if (current_user is not None):
+            data['user'] = current_user
 
         return html.render('image.html', values = data)
 
@@ -80,6 +132,9 @@ class RootDirectory(Directory):
     def thumbnails(self):
         num_images = image.num_images()
         data = {'image_keys':[i+1 for i in range(num_images)]}
+        current_user = quixote.get_request().get_cookie('user')
+        if (current_user is not None):
+            data['user'] = current_user
 
         return html.render('thumbnails.html', values = data)
 
@@ -113,7 +168,8 @@ class RootDirectory(Directory):
         request = quixote.get_request()
         query = request.form['query']
         data = {'image_keys':image.search_metadata(query)}
+        current_user = quixote.get_request().get_cookie('user')
+        if (current_user is not None):
+            data['user'] = current_user
 
         return html.render('search_results.html', values = data)
-
-
