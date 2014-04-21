@@ -51,3 +51,12 @@
  * Commenting now works properly.
  * Specific images can be referenced by including the key in the URL, as in 
  hostname:port/image_with_key?key=1 for the first image uploaded.
+
+ 2014-04-09  Zachary Hopping <hoppingz@msu.edu>
+ * Commenting now works properly.
+ * Specific images can be referenced by including the key in the URL, as in 
+ hostname:port/image_with_key?key=1 for the first image uploaded.
+
+2014-04-16  Zachary Hopping <hoppingz@msu.edu>
+ * All data persisted in SQLite.
+ * Site now supports account creation, login, and authentication, with info stored in cookies.
