@@ -1,0 +1,8 @@
+@main("Image Uploader") {
+	
+	@helper.form(action = routes.Application.add_image, 'enctype -> "multipart/form-data") {
+		Upload a png image:<br/>
+		<input type="file" name="image">
+		<input type="submit">
+	}
+}
