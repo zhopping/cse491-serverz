@@ -73,3 +73,8 @@
  	23. URL handler
  * Initial changes for implementing image ownership and deletion by uploader and
  imageapp functionality in Scala Play
+
+ 2014-04-23  Zachary Hopping <hoppingz@msu.edu>
+ * Images are tracked by uploader and may be deleted by owner.
+ * Repo contains basic version of imageapp in Play framework.  Database access in the Play
+ app is bugged and will be fixed for next Thursday 5/1/14.
