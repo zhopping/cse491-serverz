@@ -19,7 +19,7 @@ def setup():                            # stuff that should be run once.
     c = db.cursor()
     c.execute('CREATE TABLE if not exists image_store (i INTEGER PRIMARY KEY, image BLOB,' +
     'filetype TEXT, title TEXT, description TEXT, location TEXT, date_taken TEXT, comments TEXT,'
-    'owner INTEGER)')
+    'owner TEXT)')
     c.execute('CREATE TABLE if not exists account_store (i INTEGER PRIMARY KEY, username TEXT, password TEXT)')
     print "NUM IMAGES IN DB:"
     print image.num_images()

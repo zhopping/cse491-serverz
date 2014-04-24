@@ -14,13 +14,13 @@ class Image:
 			self.filetype = filetype
 
 
-def add_image(image):
+def add_image(image, owner):
 	db = sqlite3.connect('images.sqlite')
 	db.text_factory = bytes
 	db.execute('INSERT INTO image_store (image, filetype, title, '
-		'description, date_taken, location, comments) VALUES (?,?,?,?,?,?,?)', 
+		'description, date_taken, location, comments, owner) VALUES (?,?,?,?,?,?,?)', 
 	(image.data, image.filetype, image.metadata['title'], image.metadata['description'], 
-		image.metadata['date'], image.metadata['location'], ''))
+		image.metadata['date'], image.metadata['location'], '', owner))
 	db.commit()
 	db.close()
 
@@ -113,6 +113,39 @@ def matches_metadata(metadata, query):
 			return True
 	return False
 
+def delete_latest_image():
+	db = sqlite3.connect('images.sqlite')
+	db.text_factory = bytes
+	c = db.cursor()
+	c.execute('DELETE FROM image_store ORDER BY i DESC')
+	db.close()
+
+def delete_image(key):
+	db = sqlite3.connect('images.sqlite')
+	db.text_factory = bytes
+	c = db.cursor()
+	c.execute('DELETE FROM image_store WHERE i=%s' % key)
+	db.close()
+
+def get_owner_latest():
+	db = sqlite3.connect('images.sqlite')
+	db.text_factory = bytes
+	c = db.cursor()
+	c.execute('SELECT owner FROM image_store ORDER BY i DESC LIMIT 1')
+	owner = c.fetchone()
+	db.close()
+	return owner
+
+def get_owner(index):
+	db = sqlite3.connect('images.sqlite')
+	db.text_factory = bytes
+	c = db.cursor()
+	c.execute('SELECT owner FROM image_store WHERE i=%s' % index)
+
+	owner = c.fetchone()
+	db.close()
+
+	return owner
 
 def search_metadata(query):
 	db = sqlite3.connect('images.sqlite')
