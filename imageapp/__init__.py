@@ -27,7 +27,7 @@ def setup():                            # stuff that should be run once.
         print "ADDING DEFAULT DICE IMG"
         some_data = open('imageapp/dice.png', 'rb').read()
         metadata = {'title':'Dice', 'description':'some dice', 'location':'Diceville', 'date':'08/12/1999'}
-        image.add_image(Image(some_data, 'png', metadata))
+        image.add_image(Image(some_data, 'png', metadata), '')
     
     db.commit()
     db.close()

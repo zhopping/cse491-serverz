@@ -18,7 +18,7 @@ def add_image(image, owner):
 	db = sqlite3.connect('images.sqlite')
 	db.text_factory = bytes
 	db.execute('INSERT INTO image_store (image, filetype, title, '
-		'description, date_taken, location, comments, owner) VALUES (?,?,?,?,?,?,?)', 
+		'description, date_taken, location, comments, owner) VALUES (?,?,?,?,?,?,?,?)', 
 	(image.data, image.filetype, image.metadata['title'], image.metadata['description'], 
 		image.metadata['date'], image.metadata['location'], '', owner))
 	db.commit()
@@ -117,14 +117,16 @@ def delete_latest_image():
 	db = sqlite3.connect('images.sqlite')
 	db.text_factory = bytes
 	c = db.cursor()
-	c.execute('DELETE FROM image_store ORDER BY i DESC')
+	db.execute('DELETE FROM image_store WHERE i=(SELECT MAX(i) FROM image_store)')
+	db.commit()
 	db.close()
 
 def delete_image(key):
 	db = sqlite3.connect('images.sqlite')
 	db.text_factory = bytes
 	c = db.cursor()
-	c.execute('DELETE FROM image_store WHERE i=%s' % key)
+	db.execute('DELETE FROM image_store WHERE i=%s;' % key)
+	db.commit()
 	db.close()
 
 def get_owner_latest():

@@ -20,17 +20,22 @@ class RootDirectory(Directory):
 
     @export(name='upload')
     def upload(self):
+        data = {}
         current_user = quixote.get_request().get_cookie('user')
         if (current_user is not None):
             data['user'] = current_user
-        return html.render('upload.html')
+        return html.render('upload.html', data)
 
     @export(name='delete_latest')
     def delete_latest(self):
         current_user = quixote.get_request().get_cookie('user')
         if (current_user is not None):
-            if (current_user == image.get_owner_latest()):
-                image.delete_latest()
+            print 'OWNER: '
+            print image.get_owner_latest()[0]
+            print 'CURRENT USER: '
+            print current_user
+            if (current_user == image.get_owner_latest()[0]):
+                image.delete_latest_image()
         return quixote.redirect('./')
 
     @export(name='delete')
@@ -39,8 +44,8 @@ class RootDirectory(Directory):
         if (current_user is not None):
             request = quixote.get_request()
             key = request.form['key']
-            if (current_user == image.get_owner(key)):
-                image.delete_(key)
+            if (current_user == image.get_owner(key)[0]):
+                image.delete_image(key)
         return quixote.redirect('./')
 
     @export(name='create_account')
@@ -116,7 +121,7 @@ class RootDirectory(Directory):
         current_user = quixote.get_request().get_cookie('user')
         if (current_user is not None):
             data['user'] = current_user
-            if (current_user == image.get_owner(key)):
+            if (current_user == image.get_owner(key)[0]):
                 data['can_delete'] = True
 
         return html.render('image.html', values = data)
@@ -131,7 +136,7 @@ class RootDirectory(Directory):
         current_user = quixote.get_request().get_cookie('user')
         if (current_user is not None):
             data['user'] = current_user
-            if (current_user == image.get_owner(key)):
+            if (current_user == image.get_owner(key)[0]):
                 data['can_delete'] = True
 
         return html.render('image_with_key.html', values = data)
@@ -143,7 +148,7 @@ class RootDirectory(Directory):
         current_user = quixote.get_request().get_cookie('user')
         if (current_user is not None):
             data['user'] = current_user
-            if (current_user == image.get_owner_latest()):
+            if (current_user == image.get_owner_latest()[0]):
                 data['can_delete'] = True
 
         return html.render('image.html', values = data)
