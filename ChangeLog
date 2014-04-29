@@ -60,3 +60,21 @@
 2014-04-16  Zachary Hopping <hoppingz@msu.edu>
  * All data persisted in SQLite.
  * Site now supports account creation, login, and authentication, with info stored in cookies.
+
+ 2014-04-21  Zachary Hopping <hoppingz@msu.edu>
+ * Projects completed at this point (40 points):
+ 	4. JPEG/TIFF support
+ 	5. Thumbnails page
+ 	6. Metadata uploading, storage, retrieval
+ 	7. Metadata search
+ 	8. Commenting
+ 	15. Account creation, login, authentication
+ 	16. Data persistence in sqlite
+ 	23. URL handler
+ * Initial changes for implementing image ownership and deletion by uploader and
+ imageapp functionality in Scala Play
+
+ 2014-04-23  Zachary Hopping <hoppingz@msu.edu>
+ * Images are tracked by uploader and may be deleted by owner.
+ * Repo contains basic version of imageapp in Play framework.  Database access in the Play
+ app is bugged and will be fixed for next Thursday 5/1/14.

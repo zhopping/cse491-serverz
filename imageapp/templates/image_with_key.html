@@ -8,6 +8,11 @@ Title: {{ title }} <br>
 Description: {{ description }}<br>
 Location: {{ location }}<br>
 Date: {{ date }}<br>
+<br>
+{% if can_delete %}
+	<form enctype='multipart/form-data' action='delete?key={{ key }}' method='POST'>
+	<input type='submit' value='Delete this image'>
+{% endif %}
 <div id="comments">
 	<h1 id="comment_header">COMMENTS</h1>
 	<br>
