@@ -59,7 +59,7 @@ def get_comments(index):
 	db = sqlite3.connect('images.sqlite')
 	db.text_factory = bytes
 	c = db.cursor()
-	c.execute('SELECT comments FROM image_store WHERE i=%s' % index)
+	c.execute('SELECT comments FROM image_store WHERE i=?', (index,))
 
 	comments = c.fetchone()[0]
 	db.close()
@@ -125,7 +125,7 @@ def delete_image(key):
 	db = sqlite3.connect('images.sqlite')
 	db.text_factory = bytes
 	c = db.cursor()
-	db.execute('DELETE FROM image_store WHERE i=%s;' % key)
+	db.execute('DELETE FROM image_store WHERE i=?', (key,))
 	db.commit()
 	db.close()
 
@@ -142,7 +142,7 @@ def get_owner(index):
 	db = sqlite3.connect('images.sqlite')
 	db.text_factory = bytes
 	c = db.cursor()
-	c.execute('SELECT owner FROM image_store WHERE i=%s' % index)
+	c.execute('SELECT owner FROM image_store WHERE i=?', (index,))
 
 	owner = c.fetchone()
 	db.close()

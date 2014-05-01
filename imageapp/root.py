@@ -30,10 +30,6 @@ class RootDirectory(Directory):
     def delete_latest(self):
         current_user = quixote.get_request().get_cookie('user')
         if (current_user is not None):
-            print 'OWNER: '
-            print image.get_owner_latest()[0]
-            print 'CURRENT USER: '
-            print current_user
             if (current_user == image.get_owner_latest()[0]):
                 image.delete_latest_image()
         return quixote.redirect('./')

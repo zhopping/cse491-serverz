@@ -78,3 +78,7 @@
  * Images are tracked by uploader and may be deleted by owner.
  * Repo contains basic version of imageapp in Play framework.  Database access in the Play
  app is bugged and will be fixed for next Thursday 5/1/14.
+
+ 2014-04-23  Zachary Hopping <hoppingz@msu.edu>
+ * Fixed inserts to protect against SQL injection.
+ * Fixed database access in Scala Play app.
